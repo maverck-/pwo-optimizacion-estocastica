@@ -23,37 +23,108 @@
 export const DOMINIO = { lb: -5, ub: 5 };
 
 const CURVATURA = 0.055;    // cuánto sube la cuenca hacia los bordes
-const POZOS_EXTRA = [3, 5]; // rango de mínimos locales además del global
 const MUESTRAS = 140;       // grilla para detectar mínimos
-const SEPARACION = 1.9;     // distancia mínima entre centros de pozos
-const MARGEN_GLOBAL = 0.08; // ventaja mínima del global sobre el segundo mejor
-const RADIO_CENTRAL = 2.8;  // el global debe caer dentro de este radio
+const RADIO_CENTRAL = 3.0;  // el global debe caer dentro de este radio
 const TECHO_Y = 2.0;        // y máximo del global, deja libre la franja superior
-const INTENTOS = 80;
+const INTENTOS = 120;
+
+/**
+ * Niveles de dificultad. Lo que se controla es el FONDO de cada pozo, no su
+ * amplitud: la profundidad se compensa por la cuenca (`d = fondo + curvatura·r²`)
+ * para que un pozo lejano del centro no quede castigado por estar lejos. Sin
+ * esa corrección la cuenca decidía las profundidades reales y no el diseño.
+ *
+ *   sGlobal  ancho del pozo global: estrecho es más difícil de encontrar
+ *   fondoLoc fondo de los mínimos locales, como fracción del global
+ *   extra    cuántos mínimos locales acompañan
+ *   radio    a qué distancia del centro se coloca el global
+ *   margen   ventaja mínima exigida al global sobre el segundo mejor
+ *   senuelo  pozo ancho y profundo junto al centro, donde la cuenca ayuda
+ */
+export const DIFICULTADES = [
+  {
+    id: 'suave',
+    nombre: 'Suave',
+    sGlobal: [0.95, 1.40],
+    fondoLoc: [0.45, 0.70],
+    extra: [2, 3],
+    radio: [0, 2.2],
+    separacion: 2.1,
+    margen: 0.12,
+    senuelo: false,
+  },
+  {
+    id: 'media',
+    nombre: 'Media',
+    sGlobal: [0.70, 1.00],
+    fondoLoc: [0.70, 0.88],
+    extra: [3, 5],
+    radio: [0.8, 2.6],
+    separacion: 1.7,
+    margen: 0.05,
+    senuelo: false,
+  },
+  {
+    id: 'dura',
+    nombre: 'Dura',
+    sGlobal: [0.42, 0.62],
+    fondoLoc: [0.86, 0.96],
+    extra: [5, 8],
+    radio: [1.9, 3.0],
+    separacion: 1.2,
+    margen: 0.015,
+    senuelo: true,
+  },
+];
 
 let contador = 0;
 
-function generarPozos(rng) {
+const entre = (rng, [a, b]) => a + rng() * (b - a);
+
+/** Profundidad que deja el fondo del pozo al nivel pedido, pese a la cuenca */
+const profundidad = (fondo, x, y) => fondo + CURVATURA * (x * x + y * y);
+
+function generarPozos(cfg, rng) {
   const pozos = [];
 
-  // Pozo global: el más profundo, en la banda central
+  // Pozo global: el de fondo más bajo, dentro de la banda visible
   let cx = 0;
   let cy = 0;
+  let guardiaG = 0;
   do {
-    cx = (rng() * 2 - 1) * RADIO_CENTRAL;
-    cy = (rng() * 2 - 1) * RADIO_CENTRAL;
-  } while (Math.hypot(cx, cy) > RADIO_CENTRAL || cy > TECHO_Y);
-  pozos.push({ x: cx, y: cy, d: 1, s: 0.9 + rng() * 0.45 });
+    const r = entre(rng, cfg.radio);
+    const ang = rng() * Math.PI * 2;
+    cx = r * Math.cos(ang);
+    cy = r * Math.sin(ang);
+    guardiaG += 1;
+  } while ((Math.hypot(cx, cy) > RADIO_CENTRAL || cy > TECHO_Y) && guardiaG < 200);
+  pozos.push({ x: cx, y: cy, d: profundidad(1, cx, cy), s: entre(rng, cfg.sGlobal) });
 
-  // Mínimos locales: menos profundos, pero competitivos
-  const extra = POZOS_EXTRA[0] + Math.floor(rng() * (POZOS_EXTRA[1] - POZOS_EXTRA[0] + 1));
+  // Señuelo: pozo ancho junto al centro. La cuenca tira hacia allá, así que
+  // atrae a la manada mientras el óptimo real queda fuera del centro.
+  if (cfg.senuelo) {
+    let sx = 0;
+    let sy = 0;
+    let guardiaS = 0;
+    do {
+      sx = (rng() * 2 - 1) * 1.1;
+      sy = (rng() * 2 - 1) * 1.1;
+      guardiaS += 1;
+    } while (Math.hypot(sx - cx, sy - cy) < cfg.separacion && guardiaS < 200);
+    const fondo = entre(rng, cfg.fondoLoc);
+    pozos.push({ x: sx, y: sy, d: profundidad(fondo, sx, sy), s: 1.3 + rng() * 0.45 });
+  }
+
+  // Mínimos locales
+  const extra = Math.round(entre(rng, cfg.extra));
   let guardia = 0;
-  while (pozos.length < extra + 1 && guardia < 400) {
+  while (pozos.length < extra + 1 && guardia < 600) {
     guardia += 1;
     const x = (rng() * 2 - 1) * 4.2;
     const y = (rng() * 2 - 1) * 4.2;
-    if (pozos.some((p) => Math.hypot(p.x - x, p.y - y) < SEPARACION)) continue;
-    pozos.push({ x, y, d: 0.55 + rng() * 0.31, s: 0.7 + rng() * 0.8 });
+    if (pozos.some((p) => Math.hypot(p.x - x, p.y - y) < cfg.separacion)) continue;
+    const fondo = entre(rng, cfg.fondoLoc);
+    pozos.push({ x, y, d: profundidad(fondo, x, y), s: 0.65 + rng() * 0.8 });
   }
 
   return pozos;
@@ -124,32 +195,15 @@ function refinar(cruda, punto) {
   return { x, y, v };
 }
 
-function intentar(rng) {
-  const pozos = generarPozos(rng);
-  const cruda = crudaDe(pozos);
-  const { minimos, max } = buscarMinimos(cruda);
-
-  if (minimos.length < 3) return null; // queremos trampas, no un valle solo
-
-  const global = refinar(cruda, minimos[0]);
-  const segundo = minimos[1].v;
-  const rango = max - global.v;
-
-  // Un único global, con ventaja clara sobre el segundo mejor
-  if (segundo - global.v < MARGEN_GLOBAL * rango) return null;
-  // Y ubicado en la banda central, lejos de las tarjetas flotantes
-  if (Math.hypot(global.x, global.y) > RADIO_CENTRAL + 0.4) return null;
-  if (global.y > TECHO_Y + 0.4) return null;
-
+function envolver(cruda, minimos, max, global, cfg) {
   const desplazamiento = global.v;
   const fxy = (x, y) => cruda(x, y) - desplazamiento;
   const maxVisible = max - desplazamiento;
-
   contador += 1;
-
   return {
     id: `terreno-${contador}`,
-    nombre: `Terreno ${contador}`,
+    nombre: `${cfg.nombre} · ${contador}`,
+    dificultad: cfg.id,
     fxy,
     f: (p) => fxy(p[0], p[1]),
     optimos: [[global.x, global.y]],
@@ -160,33 +214,50 @@ function intentar(rng) {
   };
 }
 
-/** Terreno nuevo, garantizando las tres condiciones de arriba */
-export function crearTerreno(rng = Math.random) {
+function intentar(cfg, rng) {
+  const pozos = generarPozos(cfg, rng);
+  const cruda = crudaDe(pozos);
+  const { minimos, max } = buscarMinimos(cruda);
+
+  if (minimos.length < 3) return null; // queremos trampas, no un valle solo
+
+  const global = refinar(cruda, minimos[0]);
+  const segundo = minimos[1].v;
+  const rango = max - global.v;
+
+  // Un único global, con ventaja clara sobre el segundo mejor
+  if (segundo - global.v < cfg.margen * rango) return null;
+  // Y ubicado en la banda visible, lejos de las tarjetas flotantes
+  if (Math.hypot(global.x, global.y) > RADIO_CENTRAL + 0.4) return null;
+  if (global.y > TECHO_Y + 0.4) return null;
+
+  return envolver(cruda, minimos, max, global, cfg);
+}
+
+/**
+ * Terreno nuevo del nivel pedido, garantizando un único mínimo global con
+ * margen sobre el segundo mejor, mínimos locales que sirvan de trampa, y el
+ * óptimo dentro de la banda visible.
+ */
+export function crearTerreno(dificultad = 1, rng = Math.random) {
+  const cfg = DIFICULTADES[clampIndice(dificultad)];
   for (let k = 0; k < INTENTOS; k += 1) {
-    const t = intentar(rng);
+    const t = intentar(cfg, rng);
     if (t) return t;
   }
-  // Respaldo determinista: cuenca con un pozo central y dos trampas
+  // Respaldo determinista: un pozo con tres trampas alrededor
   const pozos = [
-    { x: 0, y: -0.4, d: 1, s: 1.1 },
-    { x: -2.6, y: 2.2, d: 0.72, s: 1.1 },
-    { x: 2.8, y: 1.6, d: 0.66, s: 0.95 },
-    { x: 1.4, y: -3.2, d: 0.7, s: 1 },
+    { x: 0.6, y: -0.9, d: profundidad(1, 0.6, -0.9), s: 0.9 },
+    { x: -2.6, y: 1.8, d: profundidad(0.85, -2.6, 1.8), s: 1.1 },
+    { x: 2.8, y: 1.4, d: profundidad(0.8, 2.8, 1.4), s: 0.95 },
+    { x: 1.2, y: -3.4, d: profundidad(0.82, 1.2, -3.4), s: 1 },
   ];
   const cruda = crudaDe(pozos);
-  const { max } = buscarMinimos(cruda);
-  const global = refinar(cruda, { x: 0, y: -0.4 });
-  const fxy = (x, y) => cruda(x, y) - global.v;
-  const maxVisible = max - global.v;
-  contador += 1;
-  return {
-    id: `terreno-${contador}`,
-    nombre: `Terreno ${contador}`,
-    fxy,
-    f: (p) => fxy(p[0], p[1]),
-    optimos: [[global.x, global.y]],
-    locales: [[-2.6, 2.2], [2.8, 1.6], [1.4, -3.2]],
-    max: maxVisible,
-    norma: (v) => Math.min(1, Math.max(0, (v / maxVisible) ** 0.6)),
-  };
+  const { minimos, max } = buscarMinimos(cruda);
+  const global = refinar(cruda, { x: 0.6, y: -0.9 });
+  return envolver(cruda, minimos.length ? minimos : [global], max, global, cfg);
+}
+
+export function clampIndice(i) {
+  return Math.min(DIFICULTADES.length - 1, Math.max(0, Math.round(i)));
 }

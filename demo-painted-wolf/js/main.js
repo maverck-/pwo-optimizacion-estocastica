@@ -10,7 +10,7 @@
  * nueva, y el rally se muestra como líneas desde los votantes hacia el alfa.
  */
 import { crearManada, iterarPWO, VOTO } from './pwo.js';
-import { crearTerreno, DOMINIO } from './terreno.js';
+import { crearTerreno, DIFICULTADES, DOMINIO } from './terreno.js';
 
 // ————— Constantes —————
 
@@ -56,9 +56,9 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 // N por defecto en 8 y no en 24: con manadas grandes la muestra inicial ya cae
 // cerca del óptimo (23 % de las veces con N = 24) y la corrida se resuelve en
 // dos o tres iteraciones, sin que se alcance a ver el algoritmo trabajar.
-const params = { n: 8, T: 200, c: VOTO };
+const params = { n: 8, T: 200, c: VOTO, dif: 1 };
 
-let paisaje = crearTerreno();
+let paisaje = crearTerreno(params.dif);
 // Rama de exploración. Por defecto la variante por componente, porque la
 // literal del paper colapsa a los agentes sobre la recta x₁ = x₂ y eso se lee
 // como un error. El botón E activa la literal para mostrar justamente eso.
@@ -144,7 +144,7 @@ function colorModo(alfa = 1) {
 
 function reiniciar({ nuevoPaisaje = false } = {}) {
   if (nuevoPaisaje) {
-    paisaje = crearTerreno();
+    paisaje = crearTerreno(params.dif);
     mapaClave = '';
   }
 
@@ -332,19 +332,58 @@ function dibujar() {
   ctx.fillStyle = vin;
   ctx.fillRect(0, 0, W, H);
 
-  // Caja del dominio factible: fuera de ella las posiciones se saturan
+  // Caja del dominio factible: fuera de ella las posiciones se saturan.
+  // Va marcada con fuerza porque es la frontera del problema, no un adorno.
   const [x0, y0] = aPantalla([DOMINIO.lb, DOMINIO.ub], g);
   const lado = (DOMINIO.ub - DOMINIO.lb) * g.escala;
-  ctx.strokeStyle = 'rgba(242,233,221,0.22)';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([5, 5]);
+
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,196,107,0.55)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([9, 6]);
+  ctx.shadowColor = 'rgba(0,0,0,0.55)';
+  ctx.shadowBlur = 6;
   ctx.strokeRect(x0, y0, lado, lado);
-  ctx.setLineDash([]);
-  ctx.font = '11px "Geist Mono", ui-monospace, Menlo, monospace';
+  ctx.restore();
+
+  // Escuadras en las esquinas, para leer la frontera de un vistazo
+  const esq = Math.min(26, lado * 0.06);
+  ctx.strokeStyle = 'rgba(255,214,150,0.9)';
+  ctx.lineWidth = 3;
+  for (const [ex, ey, sx, sy] of [
+    [x0, y0, 1, 1],
+    [x0 + lado, y0, -1, 1],
+    [x0, y0 + lado, 1, -1],
+    [x0 + lado, y0 + lado, -1, -1],
+  ]) {
+    ctx.beginPath();
+    ctx.moveTo(ex + sx * esq, ey);
+    ctx.lineTo(ex, ey);
+    ctx.lineTo(ex, ey + sy * esq);
+    ctx.stroke();
+  }
+
+  // Rótulo del dominio sobre una píldora, para que se lea sobre cualquier tono
+  const rotulo = `dominio factible  [${DOMINIO.lb}, ${DOMINIO.ub}]²`;
+  ctx.font = '600 12px "Geist Mono", ui-monospace, Menlo, monospace';
+  const anchoRot = ctx.measureText(rotulo).width + 20;
+  const altoRot = 24;
+  const rx = x0 + 10;
+  const ry = y0 + lado - altoRot - 10;
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(rx, ry, anchoRot, altoRot, 7);
+  else ctx.rect(rx, ry, anchoRot, altoRot);
+  ctx.fillStyle = 'rgba(12,10,8,0.72)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,196,107,0.5)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
   ctx.textAlign = 'left';
-  ctx.fillStyle = 'rgba(242,233,221,0.35)';
-  ctx.fillText(`dominio [${DOMINIO.lb}, ${DOMINIO.ub}]²`, x0 + 6, y0 + lado - 8);
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(255,214,150,0.95)';
+  ctx.fillText(rotulo, rx + 10, ry + altoRot / 2 + 0.5);
   ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
 
   // Puntos que muestran su etiqueta al pasar el cursor por encima
   const hover = [];
@@ -711,6 +750,12 @@ function conectarControles() {
   enlazar('in-n', 'out-n', (v) => String(v), (v) => { params.n = v; reiniciar(); });
   enlazar('in-t', 'out-t', (v) => String(v), (v) => { params.T = v; reiniciar(); });
   enlazar('in-c', 'out-c', (v) => v.toFixed(3), (v) => { params.c = v; });
+  enlazar(
+    'in-dif',
+    'out-dif',
+    (v) => DIFICULTADES[v].nombre,
+    (v) => { params.dif = v; reiniciar({ nuevoPaisaje: true }); },
+  );
 
   dom.play.addEventListener('click', alternar);
   dom.vel.addEventListener('click', cicloVelocidad);

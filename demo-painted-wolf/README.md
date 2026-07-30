@@ -92,6 +92,7 @@ nada de dibujo.
 | **N** | Tamaño de la manada: soluciones candidatas simultáneas |
 | **T** | Máximo de iteraciones, criterio de parada |
 | **c** | Incremento de voto: cuánto aporta cada lobo al rally |
+| **Terreno** | Nivel de dificultad del paisaje: Suave, Media o Dura |
 
 Barra inferior izquierda: **Play/Pausa**, **velocidad 1× / 2× / 5× / 20×**
 (toda corrida nueva parte en 1× para seguir el paso a paso con calma),
@@ -122,6 +123,31 @@ La generación se valida por rechazo para garantizar tres cosas:
 
 El terreno se desplaza para que el mínimo global valga exactamente 0, la misma
 convención de las funciones de prueba del paper.
+
+Lo que se controla es el **fondo** de cada pozo y no su amplitud: la
+profundidad se compensa por la cuenca con `d = fondo + 0.055·r²`, de modo que un
+pozo lejano del centro no queda castigado por estar lejos. Sin esa corrección
+la cuenca decidía las profundidades reales en vez del diseño.
+
+### Los tres niveles
+
+| Nivel | Pozo global | Fondo de los locales | Locales | Señuelo central |
+|---|---|---|---|---|
+| Suave | ancho, cerca del centro | 45 % a 70 % del global | 2 a 3 | no |
+| Media | intermedio | 70 % a 88 % | 3 a 5 | no |
+| Dura | estrecho, descentrado | 86 % a 96 % | 5 a 8 | sí |
+
+El nivel Dura agrega un **señuelo**: un pozo ancho y profundo junto al centro,
+donde la cuenca ya empuja a la manada, mientras el óptimo real queda
+descentrado y estrecho. El terreno miente sobre dónde conviene buscar.
+
+Medido con N = 8, T = 200 y 100 corridas por nivel:
+
+| Nivel | Halla el global | Queda atrapado | Iteraciones p25 / mediana / p75 |
+|---|---|---|---|
+| Suave | 99 % | 1 % | 4 / 6 / 12 |
+| Media | 86 % | 14 % | 4 / 8 / 15 |
+| Dura | 60 % | 40 % | 5 / 11 / 23 |
 
 ## Variante de exploración
 
