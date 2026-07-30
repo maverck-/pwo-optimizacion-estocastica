@@ -34,15 +34,15 @@ Sheikhi (2026), DOI 10.32604/cmc.2026.077788.
 
 ### Contenido visible
 
-\[
+$$
 \mathbf{X}_i(t)=
 [X_{i,1}(t),X_{i,2}(t),\ldots,X_{i,d}(t)]
-\]
+$$
 
-- \(i\): solución o agente.
-- \(j\): variable de decisión.
-- \(t\): iteración.
-- \(f(\mathbf{X}_i)\): calidad de la asignación.
+- $i$: solución o agente.
+- $j$: variable de decisión.
+- $t$: iteración.
+- $f(\mathbf{X}_i)$: calidad de la asignación.
 
 ### Mensaje central
 
@@ -62,17 +62,17 @@ Sheikhi (2026), secciones 2.1 a 2.5.
 
 ### Contenido visible
 
-\[
+$$
 X_{i,j}(0)=
 lb_j+u_{i,j}(ub_j-lb_j),
 \qquad u_{i,j}\sim U(0,1)
-\]
+$$
 
 Flujo:
 
-1. generar \(N\) soluciones;
-2. evaluar \(f(\mathbf{X}_i)\);
-3. conservar la mejor como \(\mathbf{X}_{\alpha}\);
+1. generar $N$ soluciones;
+2. evaluar $f(\mathbf{X}_i)$;
+3. conservar la mejor como $\mathbf{X}_{\alpha}$;
 4. reparar por saturación si una variable sale del dominio.
 
 ### Mensaje central
@@ -94,22 +94,22 @@ Código oficial `Python/PWO.py` y `Matlab/PWO.m`.
 
 ### Contenido visible
 
-1. \(a(t)=2(1-t/T)\)
-2. \(L(t)=|0.04/a(t)|\)
+1. $a(t)=2(1-t/T)$
+2. $L(t)=|0.04/a(t)|$
 3. cada agente cercano al alfa aporta 0.04
-4. se compara fuerza \(R(t)\) con umbral \(H(t)\)
+4. se compara fuerza $R(t)$ con umbral $H(t)$
 
-\[
+$$
 R(t)<H(t)
 \Rightarrow
 \text{exploración}
-\]
+$$
 
-\[
+$$
 R(t)\geq H(t)
 \Rightarrow
 \text{explotación}
-\]
+$$
 
 ### Mensaje central
 
@@ -142,7 +142,7 @@ Actualizar cada dimensión con respecto al alfa.
 ### Mensaje central
 
 Las tres ramas reciben la misma población, pero construyen
-\(\mathbf{X}_i(t+1)\) con información distinta.
+$\mathbf{X}_i(t+1)$ con información distinta.
 
 ### Fuente
 
@@ -158,18 +158,18 @@ Sheikhi (2026), ecuaciones 4 a 9.
 
 ### Contenido visible
 
-\[
+$$
 D_{i,j}^{rand}=
 |(2Lr_1+r_2)X_{rand,j}-X_{i,j}|
-\]
+$$
 
-\[
+$$
 \mathbf{X}_i(t+1)=
 X_{rand,j}-(2ar_1-a)D_{i,j}^{rand}
-\]
+$$
 
 - se elige otro agente al azar;
-- se calcula una distancia en la dimensión \(j\);
+- se calcula una distancia en la dimensión $j$;
 - el escalar resultante se asigna al vector completo.
 
 ### Mensaje central
@@ -190,18 +190,18 @@ Sheikhi (2026), ecuaciones 4 y 5.
 
 ### Contenido visible
 
-\[
+$$
 \mathbf{X}_i(t+1)=
 (\mathbf{X}_{\alpha}-\overline{\mathbf{X}})
 -
 R|\mathbf{X}_{\alpha}-\mathbf{X}_i|
-\]
+$$
 
 **Dirección global**  
-\(\mathbf{X}_{\alpha}-\overline{\mathbf{X}}\)
+$\mathbf{X}_{\alpha}-\overline{\mathbf{X}}$
 
 **Ajuste individual**  
-\(R|\mathbf{X}_{\alpha}-\mathbf{X}_i|\)
+$R|\mathbf{X}_{\alpha}-\mathbf{X}_i|$
 
 ### Mensaje central
 
@@ -222,23 +222,23 @@ Sheikhi (2026), ecuación 6.
 
 ### Contenido visible
 
-\[
+$$
 D_{i,j}^{\alpha}=
 |X_{\alpha,j}-X_{i,j}|
-\]
+$$
 
-\[
+$$
 A_2=R+a(2ar_1-a)L
-\]
+$$
 
-\[
+$$
 X_{i,j}(t+1)=
 X_{\alpha,j}-A_2D_{i,j}^{\alpha}
-\]
+$$
 
 ### Mensaje central
 
-Esta ecuación responde directamente qué valor recibe la variable \(j\) en la
+Esta ecuación responde directamente qué valor recibe la variable $j$ en la
 siguiente iteración.
 
 ### Fuente
@@ -257,31 +257,31 @@ Sheikhi (2026), ecuaciones 7 a 9.
 
 Agente:
 
-\[
+$$
 \mathbf{X}_1(t)=(1.01,1.00)
-\]
+$$
 
 Alfa:
 
-\[
+$$
 \mathbf{X}_{\alpha}(t)=(1.00,0.99)
-\]
+$$
 
 Parámetros fijados:
 
-\[
+$$
 a=1.8,\quad L=0.022222,\quad R=0.08,\quad A_2=0.1088
-\]
+$$
 
 Resultado:
 
-\[
+$$
 \mathbf{X}_1(t+1)=(0.998912,0.988912)
-\]
+$$
 
-\[
+$$
 f:\;2.0201\rightarrow1.975772
-\]
+$$
 
 ### Mensaje central
 
@@ -306,16 +306,16 @@ Configuración:
 - 20 agentes;
 - 3 dimensiones;
 - 100 iteraciones;
-- dominio \([-100,100]^3\);
+- dominio $[-100,100]^3$;
 - semilla 20260728.
 
 Resultado:
 
-\[
+$$
 4281.3964
 \;\longrightarrow\;
 2.5198\times10^{-92}
-\]
+$$
 
 ### Mensaje central
 
@@ -337,7 +337,7 @@ Ejecución local de la implementación Python oficial.
 ### Contenido visible
 
 1. el código usa un aleatorio adicional en el umbral;
-2. Python no lleva \(a(t)\) exactamente a cero;
+2. Python no lleva $a(t)$ exactamente a cero;
 3. MATLAB puede dividir por cero en la última iteración;
 4. la última población generada no se evalúa;
 5. las ramas vectoriales se ejecutan dentro del ciclo de dimensiones.

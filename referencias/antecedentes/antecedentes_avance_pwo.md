@@ -51,7 +51,7 @@ Para el proyecto se indicó:
 - Estudiar el algoritmo y explicarlo en un informe y una presentación de avance.
 - Preparar el informe y presentación final para el 5 de septiembre.
 
-La explicación de Pendulum Search dejó una pauta especialmente útil: una dimensión es una variable de decisión; cada variable pertenece a una solución o agente; y una ecuación de movimiento debe mostrar qué valor recibe la variable \(j\) de la solución \(i\) en la iteración \(t+1\), a partir de información disponible en la iteración \(t\).
+La explicación de Pendulum Search dejó una pauta especialmente útil: una dimensión es una variable de decisión; cada variable pertenece a una solución o agente; y una ecuación de movimiento debe mostrar qué valor recibe la variable $j$ de la solución $i$ en la iteración $t+1$, a partir de información disponible en la iteración $t$.
 
 En el cierre de la clase, el profesor volvió a insistir en que las ecuaciones de movimiento deben quedar "bien explicaditas", porque esa comprensión reduce los problemas de implementación.
 
@@ -86,27 +86,27 @@ La formulación más directa del profesor fue que la clave no es la metáfora de
 
 **Tipo de algoritmo:** metaheurística poblacional de inteligencia de enjambre para optimización continua.
 
-**Representación:** cada lobo \(i\) es una solución real de dimensión \(d\):
+**Representación:** cada lobo $i$ es una solución real de dimensión $d$:
 
-\[
+$$
 \mathbf{X}_i(t) = [X_{i,1}(t), X_{i,2}(t), \ldots, X_{i,d}(t)]
-\]
+$$
 
-Cada componente \(X_{i,j}\) es el valor asignado a la variable de decisión \(j\) de la solución \(i\).
+Cada componente $X_{i,j}$ es el valor asignado a la variable de decisión $j$ de la solución $i$.
 
 **Problema general:**
 
-\[
+$$
 \min_{\mathbf{x} \in \mathbb{R}^d} f(\mathbf{x})
 \quad \text{sujeto a} \quad
 lb_j \le x_j \le ub_j
-\]
+$$
 
 **Salida:** la mejor posición encontrada, `Alpha_pos`, y su evaluación, `Alpha_score`.
 
 ## 4. Flujo operacional de PWO
 
-1. Inicializar \(N\) soluciones aleatorias dentro del dominio.
+1. Inicializar $N$ soluciones aleatorias dentro del dominio.
 2. Evaluar la función objetivo de cada solución.
 3. Identificar la mejor solución actual, llamada alfa.
 4. Calcular la influencia dinámica del alfa.
@@ -124,110 +124,110 @@ lb_j \le x_j \le ub_j
 
 ### Inicialización de variables de decisión
 
-Para cada agente \(i\) y dimensión \(j\):
+Para cada agente $i$ y dimensión $j$:
 
-\[
+$$
 X_{i,j}(0) = lb_j + u_{i,j}(ub_j-lb_j),
 \qquad u_{i,j} \sim U(0,1)
-\]
+$$
 
 Esta ecuación asigna a cada variable un valor real aleatorio dentro de su dominio.
 
 ### Parámetro de control
 
-El paper señala que \(a(t)\) decrece linealmente desde 2 hasta 0:
+El paper señala que $a(t)$ decrece linealmente desde 2 hasta 0:
 
-\[
+$$
 a(t) = 2\left(1-\frac{t}{T}\right)
-\]
+$$
 
 Su función es modificar el comportamiento de búsqueda a medida que avanzan las iteraciones.
 
 ### Influencia del alfa
 
-Con \(c=\texttt{VOTE\_INCREMENT}=0.04\):
+Con $c=\texttt{VOTE\_INCREMENT}=0.04$:
 
-\[
+$$
 L(t)=\texttt{Alpha\_influence}(t)
 =
 \left|\frac{c}{a(t)}\right|
-\]
+$$
 
 ### Fuerza del rally
 
 Cada agente no alfa vota si cumple:
 
-\[
+$$
 f(\mathbf{X}_i) - L(t)f(\mathbf{X}_{\alpha})
 \le
 f(\mathbf{X}_{\alpha})
-\]
+$$
 
 Por cada voto, la fuerza se incrementa en 0.04:
 
-\[
+$$
 R(t)=c\sum_{i\ne\alpha}
 \mathbb{I}\left[
 f(\mathbf{X}_i)-L(t)f(\mathbf{X}_{\alpha})
 \le f(\mathbf{X}_{\alpha})
 \right]
-\]
+$$
 
 ### Umbral del rally
 
 Según la ecuación 3 del paper:
 
-\[
+$$
 H(t)=
 \operatorname{round}
 \left(
 \frac{a(t)(2r_3-r_4)}{L(t)}+r_4
 \right),
 \qquad r_3,r_4\sim U(0,1)
-\]
+$$
 
 La decisión global es:
 
-- \(R(t)<H(t)\): exploración.
-- \(R(t)\ge H(t)\): explotación.
+- $R(t)<H(t)$: exploración.
+- $R(t)\ge H(t)$: explotación.
 
 ## 6. Ecuaciones que asignan los nuevos valores reales
 
 ### Exploración, estrategia 1: seguir a un agente aleatorio
 
-Se elige un agente aleatorio \(\mathbf{X}_{rand}\). Para una dimensión \(j\):
+Se elige un agente aleatorio $\mathbf{X}_{rand}$. Para una dimensión $j$:
 
-\[
+$$
 D_{i,j}
 =
 \left|
 \left(2L(t)r_1+r_2\right)X_{rand,j}
 -X_{i,j}(t)
 \right|
-\]
+$$
 
-\[
+$$
 \mathbf{X}_i(t+1)
 =
 X_{rand,j}
 -
 \left(2a(t)r_1-a(t)\right)D_{i,j}
-\]
+$$
 
-donde \(r_1,r_2\sim U(0,1)\).
+donde $r_1,r_2\sim U(0,1)$.
 
 Interpretación:
 
-- \(D_{i,j}\) mide una distancia perturbada entre la variable actual y la misma dimensión de un agente aleatorio.
-- El factor \(2a(t)r_1-a(t)\) puede ser positivo o negativo, por lo que permite moverse en ambas direcciones.
-- El paper define una actualización escalar-a-vector: el escalar obtenido desde la dimensión \(j\) se asigna a todo el vector del agente.
+- $D_{i,j}$ mide una distancia perturbada entre la variable actual y la misma dimensión de un agente aleatorio.
+- El factor $2a(t)r_1-a(t)$ puede ser positivo o negativo, por lo que permite moverse en ambas direcciones.
+- El paper define una actualización escalar-a-vector: el escalar obtenido desde la dimensión $j$ se asigna a todo el vector del agente.
 - Este mecanismo promueve exploración, aunque requiere una explicación explícita porque es menos convencional que una actualización componente a componente.
 
 ### Exploración, estrategia 2: coordinación entre alfa y media poblacional
 
 Con probabilidad 0.5 se usa:
 
-\[
+$$
 \mathbf{X}_i(t+1)
 =
 \left(
@@ -238,7 +238,7 @@ R(t)
 \left|
 \mathbf{X}_{\alpha}(t)-\mathbf{X}_i(t)
 \right|
-\]
+$$
 
 Interpretación:
 
@@ -249,17 +249,17 @@ Interpretación:
 
 ### Explotación: convergencia hacia el alfa
 
-Para cada dimensión \(j\):
+Para cada dimensión $j$:
 
-\[
+$$
 D_{\alpha,i,j}
 =
 \left|
 X_{\alpha,j}(t)-X_{i,j}(t)
 \right|
-\]
+$$
 
-\[
+$$
 A_2
 =
 R(t)
@@ -267,44 +267,44 @@ R(t)
 a(t)
 \left(2a(t)r_1-a(t)\right)
 L(t)
-\]
+$$
 
-\[
+$$
 X_{i,j}(t+1)
 =
 X_{\alpha,j}(t)
 -A_2D_{\alpha,i,j}
-\]
+$$
 
 Interpretación:
 
-- \(D_{\alpha,i,j}\) es la distancia absoluta entre la variable del agente y la misma variable de la mejor solución.
-- \(A_2\) controla magnitud y dirección del desplazamiento.
+- $D_{\alpha,i,j}$ es la distancia absoluta entre la variable del agente y la misma variable de la mejor solución.
+- $A_2$ controla magnitud y dirección del desplazamiento.
 - El nuevo valor queda referenciado directamente al alfa.
-- Al aplicarse por dimensión, esta es la ecuación más directa para mostrar cómo se asigna un valor real a \(X_{i,j}(t+1)\).
+- Al aplicarse por dimensión, esta es la ecuación más directa para mostrar cómo se asigna un valor real a $X_{i,j}(t+1)$.
 
 ## 7. Nomenclatura mínima para informe y presentación
 
 | Símbolo | Significado |
 |---|---|
-| \(N\) | Tamaño de la población o número de lobos |
-| \(T\) | Número máximo de iteraciones |
-| \(t\) | Iteración actual |
-| \(d\) | Número de variables de decisión |
-| \(i\) | Índice de solución o agente |
-| \(j\) | Índice de variable de decisión o dimensión |
-| \(\mathbf{X}_i(t)\) | Solución \(i\) en la iteración \(t\) |
-| \(X_{i,j}(t)\) | Valor real de la variable \(j\) de la solución \(i\) |
-| \(\mathbf{X}_{\alpha}\) | Mejor solución encontrada |
-| \(f(\mathbf{X}_{\alpha})\) | Mejor fitness encontrado |
-| \(\mathbf{X}_{rand}\) | Solución escogida aleatoriamente |
-| \(lb_j,ub_j\) | Límites inferior y superior de la variable \(j\) |
-| \(a(t)\) | Parámetro de control decreciente |
-| \(c\) | Incremento de voto, fijado en 0.04 |
-| \(L(t)\) | Influencia dinámica del alfa |
-| \(R(t)\) | Fuerza acumulada del rally |
-| \(H(t)\) | Umbral que decide exploración o explotación |
-| \(r_1,r_2,r_3,r_4,q\) | Números aleatorios uniformes en \([0,1]\) |
+| $N$ | Tamaño de la población o número de lobos |
+| $T$ | Número máximo de iteraciones |
+| $t$ | Iteración actual |
+| $d$ | Número de variables de decisión |
+| $i$ | Índice de solución o agente |
+| $j$ | Índice de variable de decisión o dimensión |
+| $\mathbf{X}_i(t)$ | Solución $i$ en la iteración $t$ |
+| $X_{i,j}(t)$ | Valor real de la variable $j$ de la solución $i$ |
+| $\mathbf{X}_{\alpha}$ | Mejor solución encontrada |
+| $f(\mathbf{X}_{\alpha})$ | Mejor fitness encontrado |
+| $\mathbf{X}_{rand}$ | Solución escogida aleatoriamente |
+| $lb_j,ub_j$ | Límites inferior y superior de la variable $j$ |
+| $a(t)$ | Parámetro de control decreciente |
+| $c$ | Incremento de voto, fijado en 0.04 |
+| $L(t)$ | Influencia dinámica del alfa |
+| $R(t)$ | Fuerza acumulada del rally |
+| $H(t)$ | Umbral que decide exploración o explotación |
+| $r_1,r_2,r_3,r_4,q$ | Números aleatorios uniformes en $[0,1]$ |
 
 ## 8. Correspondencia entre paper y código oficial
 
@@ -327,24 +327,24 @@ Correspondencias principales en `Python/PWO.py`:
 | Reparación de dominio | `np.clip(Positions[i, :], lb_vec, ub_vec)` |
 | Evaluación | `fitness = fobj(Positions[i, :])` |
 | Selección del alfa | `if fitness < Alpha_score` |
-| \(a(t)\) | `2 * (1 - (t / max_iterations))` |
-| \(L(t)\) | `abs(VOTE_INCREMENT / a)` |
+| $a(t)$ | `2 * (1 - (t / max_iterations))` |
+| $L(t)$ | `abs(VOTE_INCREMENT / a)` |
 | Fuerza del rally | acumulación de `VOTE_INCREMENT` |
 | Estrategia exploratoria 1 | bloque `if q < 0.5` |
 | Estrategia exploratoria 2 | bloque `else` de exploración |
 | Explotación | bloque `rally_strength >= rally_threshold` |
 
-Una ejecución interna con semilla fija, función Sphere de 3 dimensiones, 20 agentes y 100 iteraciones redujo el fitness desde 4281.3964 hasta \(2.52\times10^{-92}\). Esto confirma que el código Python se ejecuta y converge en ese caso simple; no constituye por sí solo una validación experimental del desempeño reportado por el paper.
+Una ejecución interna con semilla fija, función Sphere de 3 dimensiones, 20 agentes y 100 iteraciones redujo el fitness desde 4281.3964 hasta $2.52\times10^{-92}$. Esto confirma que el código Python se ejecuta y converge en ese caso simple; no constituye por sí solo una validación experimental del desempeño reportado por el paper.
 
 ## 9. Puntos técnicos que deben verificarse antes de presentar resultados
 
 El paper y el código oficial no coinciden completamente en algunos detalles:
 
-1. **Umbral del rally.** La ecuación 3 reutiliza \(r_4\), mientras el código genera tres números aleatorios independientes: dos para `E0` y otro para el término sumado antes de redondear.
-2. **Límite de \(a(t)\).** El paper dice que decrece hasta cero. Python itera desde \(t=0\) hasta \(T-1\), por lo que no llega exactamente a cero. MATLAB itera desde 1 hasta \(T\), lo que puede producir una división por cero en la última iteración.
-3. **Símbolo de la ecuación 8.** El paper escribe `Linf(t)` sin definirlo explícitamente. El código usa `Alpha_influence`, por lo que la interpretación razonable es \(L(t)\).
+1. **Umbral del rally.** La ecuación 3 reutiliza $r_4$, mientras el código genera tres números aleatorios independientes: dos para `E0` y otro para el término sumado antes de redondear.
+2. **Límite de $a(t)$.** El paper dice que decrece hasta cero. Python itera desde $t=0$ hasta $T-1$, por lo que no llega exactamente a cero. MATLAB itera desde 1 hasta $T$, lo que puede producir una división por cero en la última iteración.
+3. **Símbolo de la ecuación 8.** El paper escribe `Linf(t)` sin definirlo explícitamente. El código usa `Alpha_influence`, por lo que la interpretación razonable es $L(t)$.
 4. **Momento de evaluación.** El pseudocódigo recalcula fitness después del movimiento. El código evalúa al comienzo de la siguiente iteración; por ello, las posiciones creadas en la última actualización no se vuelven a evaluar.
-5. **Actualizaciones vectoriales dentro del ciclo de dimensiones.** Las estrategias de exploración actualizan el vector completo, pero el código las ejecuta dentro del ciclo sobre \(j\). La estrategia 2, aunque no depende de \(j\), puede ejecutarse repetidamente.
+5. **Actualizaciones vectoriales dentro del ciclo de dimensiones.** Las estrategias de exploración actualizan el vector completo, pero el código las ejecuta dentro del ciclo sobre $j$. La estrategia 2, aunque no depende de $j$, puede ejecutarse repetidamente.
 6. **Reparación.** El código recorta los valores al dominio antes de evaluar, no inmediatamente después de generarlos.
 
 Para el avance conviene:
@@ -358,8 +358,8 @@ Para el avance conviene:
 
 Usar un ejemplo pequeño permite satisfacer directamente la invitación del profesor:
 
-- Función: \(f(\mathbf{x})=\sum_j x_j^2\).
-- Dominio: por ejemplo, \([-10,10]^2\).
+- Función: $f(\mathbf{x})=\sum_j x_j^2$.
+- Dominio: por ejemplo, $[-10,10]^2$.
 - Población: 3 agentes.
 - Dimensiones: 2 variables.
 - Mostrar una sola iteración.
@@ -370,12 +370,12 @@ Secuencia:
 1. Mostrar la matriz inicial de posiciones.
 2. Calcular el fitness de cada fila.
 3. Identificar el alfa.
-4. Calcular \(a(t)\) y \(L(t)\).
-5. Mostrar qué agentes votan y obtener \(R(t)\).
-6. Calcular \(H(t)\).
+4. Calcular $a(t)$ y $L(t)$.
+5. Mostrar qué agentes votan y obtener $R(t)$.
+6. Calcular $H(t)$.
 7. Determinar si corresponde exploración o explotación.
 8. Sustituir valores en una ecuación de movimiento.
-9. Obtener \(X_{i,1}(t+1)\) y \(X_{i,2}(t+1)\).
+9. Obtener $X_{i,1}(t+1)$ y $X_{i,2}(t+1)$.
 10. Reparar si alguna variable sale del dominio.
 11. Evaluar la nueva solución y compararla con la anterior.
 

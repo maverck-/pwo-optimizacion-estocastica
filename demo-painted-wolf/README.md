@@ -9,6 +9,14 @@ iteración, los lobos votan: si la fuerza del rally `R` queda bajo el umbral `H`
 la manada explora, y si no, se cierra sobre el alfa. **El rally no mueve a los
 lobos, decide qué ecuación los moverá.**
 
+$$
+R < H \quad\Rightarrow\quad \text{exploración}
+$$
+
+$$
+R \geq H \quad\Rightarrow\quad \text{explotación}
+$$
+
 PWO minimiza, así que el mejor punto es el más bajo. La paleta del mapa viene
 del pelaje del licaón: negro en los valles buenos, crema en las cumbres malas.
 Los paneles van en claro, como una libreta de campo sobre una foto aérea.

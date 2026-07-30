@@ -52,8 +52,8 @@ sido reproducidos independientemente en este proyecto.
 
 El objetivo de este avance es responder una pregunta operacional:
 
-> ¿Cómo obtiene PWO el valor de la variable \(j\) de la solución \(i\) en la
-> iteración \(t+1\)?
+> ¿Cómo obtiene PWO el valor de la variable $j$ de la solución $i$ en la
+> iteración $t+1$?
 
 La pregunta obliga a separar la metáfora biológica de la mecánica de
 optimización. En este informe, un lobo es una solución, una posición es un
@@ -75,22 +75,22 @@ Las contribuciones de este avance son:
 
 ### 2.1 Metaheurísticas poblacionales
 
-Sea un problema de minimización con \(d\) variables reales:
+Sea un problema de minimización con $d$ variables reales:
 
-\[
+$$
 \min_{\mathbf{x}\in\mathbb{R}^{d}} f(\mathbf{x})
-\]
+$$
 
 sujeto a:
 
-\[
+$$
 lb_j \leq x_j \leq ub_j,
 \qquad j=1,\ldots,d.
-\]
+$$
 
-Un algoritmo poblacional mantiene \(N\) soluciones:
+Un algoritmo poblacional mantiene $N$ soluciones:
 
-\[
+$$
 \mathbf{X}(t)=
 \left[
 \mathbf{X}_1(t),
@@ -98,11 +98,11 @@ Un algoritmo poblacional mantiene \(N\) soluciones:
 \ldots,
 \mathbf{X}_N(t)
 \right]^\top.
-\]
+$$
 
 Cada agente es un vector:
 
-\[
+$$
 \mathbf{X}_i(t)=
 \left[
 X_{i,1}(t),
@@ -110,11 +110,11 @@ X_{i,2}(t),
 \ldots,
 X_{i,d}(t)
 \right].
-\]
+$$
 
-El elemento \(X_{i,j}(t)\) es el valor real de la variable \(j\) de la
-solución \(i\) en la iteración \(t\). La población se evalúa mediante
-\(f(\mathbf{X}_i(t))\). En un problema de minimización, la solución alfa es la
+El elemento $X_{i,j}(t)$ es el valor real de la variable $j$ de la
+solución $i$ en la iteración $t$. La población se evalúa mediante
+$f(\mathbf{X}_i(t))$. En un problema de minimización, la solución alfa es la
 de menor fitness observado.
 
 ### 2.2 Trabajo seleccionado
@@ -145,10 +145,10 @@ por el autor.
 
 ### 3.1 Inicialización de la población
 
-Para cada agente \(i\) y cada variable \(j\), PWO genera una posición aleatoria
+Para cada agente $i$ y cada variable $j$, PWO genera una posición aleatoria
 dentro del dominio:
 
-\[
+$$
 X_{i,j}(0)
 =
 lb_j
@@ -157,7 +157,7 @@ u_{i,j}(ub_j-lb_j),
 \qquad
 u_{i,j}\sim U(0,1).
 \tag{1}
-\]
+$$
 
 Esta es la primera asignación de valores a las variables. Si los límites son
 escalares, se repiten en todas las dimensiones; si son vectores, cada variable
@@ -165,70 +165,70 @@ utiliza su propio intervalo.
 
 Después de inicializar, el algoritmo evalúa:
 
-\[
+$$
 F_i(t)=f(\mathbf{X}_i(t)).
 \tag{2}
-\]
+$$
 
 La mejor solución hasta el momento se define como:
 
-\[
+$$
 \alpha(t)
 =
 \arg\min_i F_i(t),
 \qquad
 \mathbf{X}_{\alpha}(t)=\mathbf{X}_{\alpha(t)}(t).
 \tag{3}
-\]
+$$
 
 El código conserva el mejor valor histórico en `Alpha_score` y su vector en
 `Alpha_pos`.
 
 ### 3.2 Parámetro de control e influencia del alfa
 
-El artículo señala que el parámetro \(a(t)\) decrece linealmente desde 2 hasta
+El artículo señala que el parámetro $a(t)$ decrece linealmente desde 2 hasta
 0:
 
-\[
+$$
 a(t)
 =
 2\left(1-\frac{t}{T}\right),
 \tag{4}
-\]
+$$
 
-donde \(T\) es el máximo de iteraciones.
+donde $T$ es el máximo de iteraciones.
 
 Con una constante de voto
-\(c=\texttt{VOTE\_INCREMENT}=0.04\), la influencia del alfa es:
+$c=\texttt{VOTE\_INCREMENT}=0.04$, la influencia del alfa es:
 
-\[
+$$
 L(t)
 =
 \left|
 \frac{c}{a(t)}
 \right|.
 \tag{5}
-\]
+$$
 
 Este valor participa tanto en la votación como en las ecuaciones de
-movimiento. A medida que \(a(t)\) disminuye, \(L(t)\) aumenta. Por ello no debe
-interpretarse \(a(t)\) aisladamente como un simple tamaño de paso: el
+movimiento. A medida que $a(t)$ disminuye, $L(t)$ aumenta. Por ello no debe
+interpretarse $a(t)$ aisladamente como un simple tamaño de paso: el
 comportamiento resulta de su interacción con el resto de los términos.
 
 ### 3.3 Rally y selección del modo de búsqueda
 
 Cada agente no alfa emite un voto si:
 
-\[
+$$
 F_i(t)-L(t)F_{\alpha}(t)
 \leq
 F_{\alpha}(t).
 \tag{6}
-\]
+$$
 
 La fuerza del rally es:
 
-\[
+$$
 R(t)
 =
 c
@@ -239,11 +239,11 @@ F_i(t)-L(t)F_{\alpha}(t)
 \leq F_{\alpha}(t)
 \right].
 \tag{7}
-\]
+$$
 
 El umbral publicado es:
 
-\[
+$$
 H(t)
 =
 \operatorname{round}
@@ -254,27 +254,27 @@ H(t)
 \qquad
 r_3,r_4\sim U(0,1).
 \tag{8}
-\]
+$$
 
 La decisión es global para la iteración:
 
-\[
+$$
 \begin{cases}
 R(t)<H(t), & \text{exploración},\\
 R(t)\geq H(t), & \text{explotación}.
 \end{cases}
 \tag{9}
-\]
+$$
 
 Cuando corresponde explorar, un nuevo número aleatorio
-\(q\sim U(0,1)\) selecciona una de dos estrategias con probabilidad 0.5.
+$q\sim U(0,1)$ selecciona una de dos estrategias con probabilidad 0.5.
 
 ### 3.4 Exploración 1: seguimiento de un agente aleatorio
 
 Se selecciona aleatoriamente una solución
-\(\mathbf{X}_{rand}(t)\). Para cada dimensión \(j\), se calcula:
+$\mathbf{X}_{rand}(t)$. Para cada dimensión $j$, se calcula:
 
-\[
+$$
 D_{i,j}^{rand}(t)
 =
 \left|
@@ -282,13 +282,13 @@ D_{i,j}^{rand}(t)
 -X_{i,j}(t)
 \right|,
 \tag{10}
-\]
+$$
 
-con \(r_1,r_2\sim U(0,1)\).
+con $r_1,r_2\sim U(0,1)$.
 
 Luego:
 
-\[
+$$
 \mathbf{X}_i(t+1)
 =
 X_{rand,j}(t)
@@ -296,10 +296,10 @@ X_{rand,j}(t)
 \left(2a(t)r_1-a(t)\right)
 D_{i,j}^{rand}(t).
 \tag{11}
-\]
+$$
 
 La ecuación 11 es particular porque produce un escalar a partir de la dimensión
-\(j\) y lo asigna al vector completo \(\mathbf{X}_i\). El paper describe
+$j$ y lo asigna al vector completo $\mathbf{X}_i$. El paper describe
 explícitamente esta actualización escalar-a-vector como un mecanismo para que
 la información de una dimensión influya en la dirección global de búsqueda.
 Operacionalmente, esto significa que, en esa actualización, todas las variables
@@ -310,7 +310,7 @@ si se pretende reproducir literalmente el artículo.
 
 La segunda estrategia usa el alfa y la media de la población:
 
-\[
+$$
 \mathbf{X}_i(t+1)
 =
 \left(
@@ -324,64 +324,64 @@ R(t)
 \mathbf{X}_{\alpha}(t)-\mathbf{X}_i(t)
 \right|,
 \tag{12}
-\]
+$$
 
 donde:
 
-\[
+$$
 \overline{\mathbf{X}}(t)
 =
 \frac{1}{N}
 \sum_{i=1}^{N}\mathbf{X}_i(t).
 \tag{13}
-\]
+$$
 
-La resta \(\mathbf{X}_{\alpha}-\overline{\mathbf{X}}\) introduce una dirección
+La resta $\mathbf{X}_{\alpha}-\overline{\mathbf{X}}$ introduce una dirección
 global entre la mejor solución y el centro de la población. El segundo término
 ajusta cada componente según la distancia absoluta del agente al alfa,
 ponderada por la fuerza del rally.
 
 ### 3.6 Explotación: convergencia hacia el alfa
 
-Cuando \(R(t)\geq H(t)\), PWO actualiza cada variable en dirección al alfa:
+Cuando $R(t)\geq H(t)$, PWO actualiza cada variable en dirección al alfa:
 
-\[
+$$
 D_{i,j}^{\alpha}(t)
 =
 \left|
 X_{\alpha,j}(t)-X_{i,j}(t)
 \right|,
 \tag{14}
-\]
+$$
 
-\[
+$$
 A_1(t)=2a(t)r_1-a(t),
 \tag{15}
-\]
+$$
 
-\[
+$$
 A_2(t)
 =
 R(t)
 +
 a(t)A_1(t)L(t),
 \tag{16}
-\]
+$$
 
-\[
+$$
 X_{i,j}(t+1)
 =
 X_{\alpha,j}(t)
 -
 A_2(t)D_{i,j}^{\alpha}(t).
 \tag{17}
-\]
+$$
 
 La ecuación 17 muestra directamente la asignación requerida:
 
-1. se toma el valor de la variable \(j\) de la mejor solución;
+1. se toma el valor de la variable $j$ de la mejor solución;
 2. se calcula la distancia entre ese valor y el del agente;
-3. se pondera la distancia mediante \(A_2(t)\);
+3. se pondera la distancia mediante $A_2(t)$;
 4. se resta la perturbación al valor del alfa.
 
 La actualización se repite para todas las dimensiones y agentes.
@@ -391,7 +391,7 @@ La actualización se repite para todas las dimensiones y agentes.
 Las ecuaciones pueden producir valores fuera del intervalo permitido. La
 implementación oficial utiliza saturación:
 
-\[
+$$
 X_{i,j}
 \leftarrow
 \min
@@ -400,10 +400,10 @@ ub_j,
 \max(lb_j,X_{i,j})
 \right).
 \tag{18}
-\]
+$$
 
-Si una variable excede el límite superior, se reemplaza por \(ub_j\); si cae
-por debajo del límite inferior, se reemplaza por \(lb_j\). Para las funciones
+Si una variable excede el límite superior, se reemplaza por $ub_j$; si cae
+por debajo del límite inferior, se reemplaza por $lb_j$. Para las funciones
 continuas sin otras restricciones, esta operación recupera la factibilidad.
 
 ### 3.8 Pseudocódigo operacional
@@ -433,81 +433,81 @@ Para t = 1, ..., T:
 Retornar Alpha_pos y Alpha_score
 ```
 
-La estructura dominante es \(T\times N\times d\), además del costo de evaluar
-la función objetivo. Sin considerar la complejidad interna de \(f\), el costo
-temporal del movimiento es \(O(TNd)\) y la memoria principal es \(O(Nd)\).
+La estructura dominante es $T\times N\times d$, además del costo de evaluar
+la función objetivo. Sin considerar la complejidad interna de $f$, el costo
+temporal del movimiento es $O(TNd)$ y la memoria principal es $O(Nd)$.
 
 ## 4. Ruteo numérico de una iteración
 
 Se considera la función Sphere:
 
-\[
+$$
 f(\mathbf{x})=x_1^2+x_2^2,
 \qquad
 \mathbf{x}\in[-10,10]^2.
 \tag{19}
-\]
+$$
 
 La población inicial es:
 
-| Agente | \(\mathbf{X}_i(t)\) | Fitness |
+| Agente | $\mathbf{X}_i(t)$ | Fitness |
 |---|---:|---:|
-| 1 | \((1.01,1.00)\) | \(2.0201\) |
-| 2 | \((0.99,1.01)\) | \(2.0002\) |
-| 3 | \((1.00,0.99)\) | \(1.9801\) |
+| 1 | $(1.01,1.00)$ | $2.0201$ |
+| 2 | $(0.99,1.01)$ | $2.0002$ |
+| 3 | $(1.00,0.99)$ | $1.9801$ |
 
 El agente 3 es el alfa:
 
-\[
+$$
 \mathbf{X}_{\alpha}(t)=(1.00,0.99).
-\]
+$$
 
-Se fija \(T=10\), \(t=1\) y \(c=0.04\):
+Se fija $T=10$, $t=1$ y $c=0.04$:
 
-\[
+$$
 a(t)=2\left(1-\frac{1}{10}\right)=1.8,
-\]
+$$
 
-\[
+$$
 L(t)=\frac{0.04}{1.8}=0.022222.
-\]
+$$
 
 La condición de voto equivale a:
 
-\[
+$$
 F_i(t)\leq
 (1+L(t))F_{\alpha}(t)
 =
 2.024102.
-\]
+$$
 
 Los agentes 1 y 2 votan, por lo que:
 
-\[
+$$
 R(t)=2(0.04)=0.08.
-\]
+$$
 
-Para hacer el ejemplo reproducible se fijan \(r_3=0.2\) y \(r_4=0.4\):
+Para hacer el ejemplo reproducible se fijan $r_3=0.2$ y $r_4=0.4$:
 
-\[
+$$
 2r_3-r_4=0,
 \qquad
 H(t)=\operatorname{round}(0.4)=0.
-\]
+$$
 
-Como \(R(t)=0.08\geq H(t)=0\), se selecciona explotación.
+Como $R(t)=0.08\geq H(t)=0$, se selecciona explotación.
 
-Para actualizar el agente 1 se fija \(r_1=0.7\):
+Para actualizar el agente 1 se fija $r_1=0.7$:
 
-\[
+$$
 A_1
 =
 2(1.8)(0.7)-1.8
 =
 0.72,
-\]
+$$
 
-\[
+$$
 A_2
 =
 0.08
@@ -515,64 +515,64 @@ A_2
 (1.8)(0.72)(0.022222)
 =
 0.1088.
-\]
+$$
 
 Primera variable:
 
-\[
+$$
 D_{1,1}^{\alpha}
 =
 |1.00-1.01|
 =
 0.01,
-\]
+$$
 
-\[
+$$
 X_{1,1}(t+1)
 =
 1.00-(0.1088)(0.01)
 =
 0.998912.
-\]
+$$
 
 Segunda variable:
 
-\[
+$$
 D_{1,2}^{\alpha}
 =
 |0.99-1.00|
 =
 0.01,
-\]
+$$
 
-\[
+$$
 X_{1,2}(t+1)
 =
 0.99-(0.1088)(0.01)
 =
 0.988912.
-\]
+$$
 
 La nueva solución es:
 
-\[
+$$
 \mathbf{X}_1(t+1)
 =
 (0.998912,0.988912).
-\]
+$$
 
 Su fitness es:
 
-\[
+$$
 f(\mathbf{X}_1(t+1))
 =
 1.975772.
-\]
+$$
 
-El valor mejora tanto el fitness previo del agente 1, \(2.0201\), como el
-fitness del alfa previo, \(1.9801\). En la siguiente evaluación, el agente 1
+El valor mejora tanto el fitness previo del agente 1, $2.0201$, como el
+fitness del alfa previo, $1.9801$. En la siguiente evaluación, el agente 1
 pasaría a ser la mejor solución. Ninguna variable requiere reparación porque
-ambas permanecen en \([-10,10]\).
+ambas permanecen en $[-10,10]$.
 
 ## 5. Verificación preliminar y reproducibilidad
 
@@ -581,14 +581,14 @@ ambas permanecen en \([-10,10]\).
 Se ejecutó la implementación Python oficial con:
 
 - función Sphere;
-- dimensión \(d=3\);
-- dominio \([-100,100]^3\);
+- dimensión $d=3$;
+- dominio $[-100,100]^3$;
 - 20 agentes;
 - 100 iteraciones;
 - semilla NumPy 20260728.
 
-El mejor fitness registrado disminuyó desde \(4281.3964\) en la primera
-iteración hasta \(2.5198\times10^{-92}\) en la iteración 100. La curva del mejor
+El mejor fitness registrado disminuyó desde $4281.3964$ en la primera
+iteración hasta $2.5198\times10^{-92}$ en la iteración 100. La curva del mejor
 valor fue monótona no creciente porque `Alpha_score` conserva el mejor valor
 histórico.
 
@@ -602,21 +602,21 @@ La inspección del paper y del repositorio oficial identificó los siguientes
 puntos:
 
 1. **Umbral del rally.** La ecuación 8 usa dos números aleatorios y reutiliza
-   \(r_4\). Python y MATLAB generan dos números para `E0` y un tercer número
+   $r_4$. Python y MATLAB generan dos números para `E0` y un tercer número
    independiente para el término sumado antes de redondear.
-2. **Último valor de \(a(t)\).** Python recorre \(t=0,\ldots,T-1\), por lo que
-   \(a(t)\) no llega exactamente a cero. MATLAB recorre
-   \(t=1,\ldots,T\), haciendo \(a(T)=0\) y exponiendo la última iteración a una
+2. **Último valor de $a(t)$.** Python recorre $t=0,\ldots,T-1$, por lo que
+   $a(t)$ no llega exactamente a cero. MATLAB recorre
+   $t=1,\ldots,T$, haciendo $a(T)=0$ y exponiendo la última iteración a una
    división por cero.
 3. **Símbolo de la ecuación de explotación.** El paper escribe
-   \(\mathrm{Linf}(t)\) en una ecuación sin definirlo. El código utiliza
-   `Alpha_influence`, interpretado aquí como \(L(t)\).
+   $\mathrm{Linf}(t)$ en una ecuación sin definirlo. El código utiliza
+   `Alpha_influence`, interpretado aquí como $L(t)$.
 4. **Momento de evaluación.** El pseudocódigo evalúa después del movimiento.
    Las implementaciones evalúan al comienzo de la iteración siguiente; por ello,
    la última población generada no vuelve a evaluarse.
 5. **Actualización vectorial dentro del ciclo de dimensiones.** Las dos ramas de
-   exploración escriben el vector completo dentro del ciclo sobre \(j\). La
-   segunda estrategia no utiliza \(j\), pero puede ejecutarse repetidamente.
+   exploración escriben el vector completo dentro del ciclo sobre $j$. La
+   segunda estrategia no utiliza $j$, pero puede ejecutarse repetidamente.
 6. **Reparación.** Los límites se aplican antes de evaluar, no inmediatamente
    después de cada movimiento.
 
@@ -642,7 +642,7 @@ ejecuta esa escritura dentro del ciclo de dimensiones. La experimentación futur
 deberá comparar al menos la interpretación literal del código con una versión
 que ejecute cada actualización vectorial una vez por agente.
 
-El rally también merece análisis. Debido a la división por \(L(t)\), el umbral
+El rally también merece análisis. Debido a la división por $L(t)$, el umbral
 puede tomar valores de gran magnitud, positivos o negativos. Además, el valor de
 `Alpha_score` participa directamente en la condición de voto, por lo que el
 comportamiento puede variar si la función objetivo admite valores negativos o
@@ -660,7 +660,7 @@ semillas, parámetros y número de evaluaciones.
 Para el informe final se proponen cuatro etapas:
 
 1. **Estabilización continua.** Elegir y documentar una interpretación del
-   umbral, del calendario de \(a(t)\) y de las actualizaciones vectoriales.
+   umbral, del calendario de $a(t)$ y de las actualizaciones vectoriales.
 2. **Reproducción.** Comparar resultados básicos con el código oficial sobre
    funciones Sphere, Rastrigin, Ackley y un subconjunto de las funciones usadas
    en el artículo.
@@ -681,7 +681,7 @@ El avance permitió traducir PWO desde su metáfora biológica a un proceso de
 asignación de valores. Cada lobo corresponde a una solución real, el alfa es la
 mejor solución histórica y el rally selecciona entre dos movimientos de
 exploración y uno de explotación. Las ecuaciones 11, 12 y 17 son el núcleo que
-genera \(\mathbf{X}_i(t+1)\).
+genera $\mathbf{X}_i(t+1)$.
 
 El ruteo muestra que la actualización de explotación puede seguirse variable por
 variable y producir una mejora verificable. La ejecución preliminar confirma el

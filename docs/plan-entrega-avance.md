@@ -15,7 +15,7 @@ una asignación numérica de una variable de decisión.
 - [x] Preparar estructura del informe.
 - [x] Preparar secuencia de presentación.
 - [x] Preparar primer guion.
-- [ ] Revisar entre ambos autores la notación \(i,j,t\).
+- [ ] Revisar entre ambos autores la notación $i,j,t$.
 - [ ] Confirmar que se usará el paper como formulación principal y Python como
       referencia operacional.
 
@@ -44,7 +44,7 @@ una asignación numérica de una variable de decisión.
 
 - [x] La metáfora del licaón ocupa como máximo una introducción breve.
 - [x] Se explica que cada lobo es una solución y cada dimensión una variable.
-- [x] Se muestra la inicialización dentro de \([lb_j,ub_j]\).
+- [x] Se muestra la inicialización dentro de $[lb_j,ub_j]$.
 - [x] Se explica cómo el rally selecciona exploración o explotación.
 - [x] Se muestran las dos estrategias de exploración.
 - [x] Se muestra la actualización de explotación por dimensión.

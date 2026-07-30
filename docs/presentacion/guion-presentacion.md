@@ -26,14 +26,14 @@ optimización.”
 ## Diapositiva 2 - Maverick - 55 segundos
 
 “Cada lobo es simplemente una solución candidata. Su posición es un vector de
-dimensión \(d\), y cada componente del vector es una variable de decisión.
+dimensión $d$, y cada componente del vector es una variable de decisión.
 
-El índice \(i\) identifica la solución, \(j\) identifica la variable y \(t\)
+El índice $i$ identifica la solución, $j$ identifica la variable y $t$
 identifica la iteración. La función objetivo recibe el vector completo y
 devuelve un fitness que permite comparar asignaciones.
 
 Por lo tanto, cuando el paper habla de mover un lobo, lo que realmente ocurre es
-que se construye un nuevo vector \(\mathbf{X}_i(t+1)\).”
+que se construye un nuevo vector $\mathbf{X}_i(t+1)$.”
 
 Transición:
 
@@ -60,12 +60,12 @@ movimiento realizará.”
 
 ## Diapositiva 4 - Maverick - 90 segundos
 
-“La decisión utiliza un rally. El parámetro \(a(t)\) disminuye linealmente y se
-usa para calcular la influencia del alfa, que llamamos \(L(t)\).
+“La decisión utiliza un rally. El parámetro $a(t)$ disminuye linealmente y se
+usa para calcular la influencia del alfa, que llamamos $L(t)$.
 
 Cada agente no alfa vota cuando su fitness satisface la condición definida por
-el paper. Cada voto suma 0.04 a la fuerza \(R(t)\). Paralelamente se calcula un
-umbral aleatorio \(H(t)\).
+el paper. Cada voto suma 0.04 a la fuerza $R(t)$. Paralelamente se calcula un
+umbral aleatorio $H(t)$.
 
 La comparación selecciona la fase: si la fuerza es menor al umbral, la población
 explora; si la fuerza alcanza o supera el umbral, explota.
@@ -89,7 +89,7 @@ Rogelio explicará ahora cómo cada una construye el nuevo vector.”
 ## Diapositiva 6 - Rogelio - 90 segundos
 
 “La primera exploración selecciona una solución aleatoria y una dimensión
-\(j\). Con esa dimensión calcula una distancia perturbada.
+$j$. Con esa dimensión calcula una distancia perturbada.
 
 Luego ocurre la característica más particular del algoritmo: el resultado es
 un escalar, pero el paper indica que se asigna al vector completo. Es decir, la
@@ -119,13 +119,13 @@ Transición:
 
 ## Diapositiva 8 - Rogelio - 80 segundos
 
-“Para cada variable \(j\) calculamos primero su distancia al valor correspondiente
-del alfa. Después calculamos \(A_2\), que combina fuerza del rally, el parámetro
+“Para cada variable $j$ calculamos primero su distancia al valor correspondiente
+del alfa. Después calculamos $A_2$, que combina fuerza del rally, el parámetro
 de control y un número aleatorio.
 
 Finalmente, al valor del alfa le restamos la distancia ponderada. Esta ecuación
 responde de forma explícita la pregunta del avance: el nuevo valor de
-\(X_{i,j}\) es el valor del alfa en la misma dimensión menos una perturbación.
+$X_{i,j}$ es el valor del alfa en la misma dimensión menos una perturbación.
 
 La operación se repite para cada variable.”
 
@@ -136,14 +136,14 @@ Transición:
 ## Diapositiva 9 - Rogelio - 110 segundos
 
 “Usamos la función Sphere de dos dimensiones. El agente que actualizaremos es
-\((1.01,1.00)\), con fitness 2.0201, y el alfa es
-\((1.00,0.99)\), con fitness 1.9801.
+$(1.01,1.00)$, con fitness 2.0201, y el alfa es
+$(1.00,0.99)$, con fitness 1.9801.
 
 Fijamos los números aleatorios para que el cálculo sea reproducible. El rally
-selecciona explotación y obtenemos \(A_2=0.1088\).
+selecciona explotación y obtenemos $A_2=0.1088$.
 
 En la primera dimensión la distancia al alfa es 0.01. Al multiplicarla por
-\(A_2\) y restarla a 1.00, el nuevo valor es 0.998912.
+$A_2$ y restarla a 1.00, el nuevo valor es 0.998912.
 
 En la segunda dimensión la distancia también es 0.01. Restando la perturbación
 a 0.99, obtenemos 0.988912.
@@ -161,7 +161,7 @@ Transición:
 agentes, 100 iteraciones y una semilla fija.
 
 El mejor fitness bajó desde aproximadamente 4281 hasta
-\(2.52\times10^{-92}\). La prueba confirma que el código se ejecuta y converge
+$2.52\times10^{-92}$. La prueba confirma que el código se ejecuta y converge
 en este caso sencillo.
 
 No usamos este resultado para afirmar que PWO es superior. Es una sola semilla,
@@ -179,7 +179,7 @@ resolver.”
 los detalles.
 
 Por ejemplo, el código usa un número aleatorio adicional al calcular el umbral.
-Python evita que \(a(t)\) llegue a cero, mientras MATLAB puede dividir por cero
+Python evita que $a(t)$ llegue a cero, mientras MATLAB puede dividir por cero
 en la última iteración. Además, la población generada en la última actualización
 no vuelve a evaluarse y las operaciones vectoriales están dentro del ciclo de
 dimensiones.
