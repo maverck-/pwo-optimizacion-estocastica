@@ -80,7 +80,10 @@ python3 -m http.server 8000
 El detalle de la correspondencia con las ecuaciones del informe está en
 `demo-painted-wolf/README.md`.
 
-## Paper principal
+## Referencias principales
 
-El artículo estudiado está disponible en
-`referencias/paper/PaintedWolfOptimization.pdf`.
+- Artículo: [Painted Wolf Optimization: A Novel Nature-Inspired Metaheuristic
+  Algorithm for Real-World Optimization
+  Problems](https://doi.org/10.32604/cmc.2026.077788).
+- Código de los autores:
+  [saeidsheikhi/Painted-Wolf-Optimization](https://github.com/saeidsheikhi/Painted-Wolf-Optimization).
