@@ -165,13 +165,11 @@ Medido con N = 8, T = 200 y 100 corridas por nivel:
 El botón de la barra alterna entre dos lecturas de la rama de exploración:
 
 - **Literal**: reproduce el código oficial, donde la ecuación 11 asigna un
-  escalar al vector completo dentro del ciclo de dimensiones. Es lo que hay que
-  conservar para reproducir el artículo al pie de la letra.
+  escalar al vector completo dentro del ciclo de dimensiones.
 - **Por componente**: variante didáctica donde cada ecuación actualiza solo la
   componente `j`. Separa mejor el efecto de cada dimensión.
 
-La diferencia está documentada en el informe y debe declararse al reproducir
-resultados experimentales.
+Ambas variantes están disponibles en la demo para comparar su comportamiento.
 
 ## Qué mirar durante la presentación
 

@@ -38,18 +38,16 @@ se desarrollarán para la entrega final.
 └── tests/                # Pruebas automatizadas
 ```
 
-## Repositorio oficial de referencia
+## Código de referencia
 
-El código de los autores se conserva sin modificaciones en el repositorio
-hermano:
+El código publicado por los autores está disponible en el repositorio hermano:
 
 ```text
 ../Painted-Wolf-Optimization
 ```
 
-Este repositorio no reemplaza ni modifica esa fuente. Aquí se documentarán las
-decisiones de reproducción, las pruebas, las adaptaciones y los entregables del
-curso.
+Este repositorio reúne la reproducción en Python y MATLAB, las pruebas, la demo
+interactiva y los entregables del curso.
 
 ## Documentos principales
 
@@ -79,15 +77,10 @@ cd demo-painted-wolf
 python3 -m http.server 8000
 ```
 
-Para publicarla en Vercel, importa este repositorio y configura
-`demo-painted-wolf` como **Root Directory**. No requiere variables de entorno
-ni comando de build.
-
 El detalle de la correspondencia con las ecuaciones del informe está en
 `demo-painted-wolf/README.md`.
 
-## Estado
+## Paper principal
 
-La fuente de verdad académica es el paper copiado en
-`referencias/paper/PaintedWolfOptimization.pdf`. Cuando el paper y el código
-oficial difieren, la discrepancia debe documentarse explícitamente.
+El artículo estudiado está disponible en
+`referencias/paper/PaintedWolfOptimization.pdf`.
