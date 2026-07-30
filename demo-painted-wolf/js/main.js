@@ -81,6 +81,9 @@ let tPrevio = performance.now();
 let mapa = null;             // canvas fuera de pantalla con el terreno
 let mapaClave = '';          // firma del mapa cacheado
 
+let raton = null;            // { x, y } sobre la escena, para las etiquetas al pasar
+let cursorActual = '';       // evita reescribir el estilo del cursor cada cuadro
+
 // ————— DOM —————
 
 const $ = (id) => document.getElementById(id);
@@ -269,6 +272,48 @@ function construirMapa(g) {
 }
 
 
+// ————— Etiqueta que aparece al pasar el cursor —————
+
+const FUENTE_ETIQUETA = '13px "Geist Mono", ui-monospace, Menlo, monospace';
+const FUENTE_VALOR = '600 16px "Geist Mono", ui-monospace, Menlo, monospace';
+
+function dibujarTag(etiqueta, valor, cx, cy, W) {
+  ctx.font = FUENTE_ETIQUETA;
+  const anchoEtiqueta = ctx.measureText(etiqueta).width;
+  ctx.font = FUENTE_VALOR;
+  const anchoValor = valor ? ctx.measureText(valor).width : 0;
+  const ancho = anchoEtiqueta + anchoValor + 24;
+  const alto = 28;
+  // No se sale por los costados de la pantalla
+  const x = clamp(cx - ancho / 2, 8, Math.max(8, W - ancho - 8));
+  const y = cy - alto;
+
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(x, y, ancho, alto, 8);
+  else ctx.rect(x, y, ancho, alto);
+  ctx.fillStyle = 'rgba(12,10,8,0.86)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(242,233,221,0.32)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.font = FUENTE_ETIQUETA;
+  ctx.fillStyle = 'rgba(242,233,221,0.88)';
+  ctx.fillText(etiqueta, x + 12, y + alto / 2 + 0.5);
+  if (valor) {
+    ctx.font = FUENTE_VALOR;
+    ctx.fillStyle = 'rgba(242,233,221,1)';
+    ctx.fillText(valor, x + 12 + anchoEtiqueta, y + alto / 2 + 0.5);
+  }
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+}
+
+const bajoElCursor = (px, py, radio) =>
+  raton !== null && Math.hypot(raton.x - px, raton.y - py) <= radio;
+
 // ————— Render de la escena —————
 
 function dibujar() {
@@ -298,9 +343,13 @@ function dibujar() {
   ctx.fillText(`dominio [${DOMINIO.lb}, ${DOMINIO.ub}]²`, x0 + 6, y0 + lado - 8);
   ctx.textAlign = 'center';
 
+  // Puntos que muestran su etiqueta al pasar el cursor por encima
+  const hover = [];
+
   // Óptimos globales conocidos del paisaje
   for (const o of paisaje.optimos) {
     const [ox, oy] = aPantalla(o, g);
+    hover.push({ x: ox, y: oy, r: 16, etiqueta: 'Óptimo Global: ', valor: '0.0000' });
     ctx.strokeStyle = 'rgba(242,233,221,0.5)';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
@@ -477,7 +526,34 @@ function dibujar() {
       ctx.lineTo(alfaX, alfaY);
       ctx.stroke();
       ctx.setLineDash([]);
+
+      hover.push({
+        x: alfaX,
+        y: alfaY,
+        r: radio * 2,
+        etiqueta: 'Xα recordado: ',
+        valor: recortar(est.alfaCosto, 4),
+      });
     }
+
+    hover.push({
+      x: ax,
+      y: ay,
+      r: radio * 2.4,
+      etiqueta: enRelevo ? 'Xα nuevo: ' : 'Xα: ',
+      valor: recortar(est.alfaCosto, 4),
+    });
+  }
+
+  // Etiqueta del punto bajo el cursor, encima de todo lo demás. Se busca desde
+  // el final para que el alfa gane cuando ya está sobre el óptimo global.
+  const apuntado = hover.findLast((p) => bajoElCursor(p.x, p.y, p.r));
+  if (apuntado) dibujarTag(apuntado.etiqueta, apuntado.valor, apuntado.x, apuntado.y - 14, W);
+
+  const cursor = apuntado ? 'pointer' : 'default';
+  if (cursor !== cursorActual) {
+    escena.style.cursor = cursor;
+    cursorActual = cursor;
   }
 }
 
@@ -613,6 +689,13 @@ function conectarControles() {
 
   dom.play.addEventListener('click', alternar);
   dom.vel.addEventListener('click', cicloVelocidad);
+
+  // Posición del cursor sobre la escena, para mostrar etiquetas al pasar
+  escena.addEventListener('mousemove', (e) => {
+    const caja = escena.getBoundingClientRect();
+    raton = { x: e.clientX - caja.left, y: e.clientY - caja.top };
+  });
+  escena.addEventListener('mouseleave', () => { raton = null; });
   $('btn-reiniciar').addEventListener('click', () => reiniciar());
   $('btn-paisaje').addEventListener('click', () => reiniciar({ nuevoPaisaje: true }));
   dom.variante.addEventListener('click', () => { fijarVariante(!literal); reiniciar(); });

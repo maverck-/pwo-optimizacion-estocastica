@@ -31,6 +31,10 @@ detiene, el lobo entrante **parpadea** antes de tomar el color del alfa y el
 saliente **pierde su luz** y vuelve al crema de la manada. La manada siempre
 tiene `N` miembros: el alfa es un color, no una bola aparte.
 
+La escena no lleva rótulos fijos para no estorbar el movimiento. Al **pasar el
+cursor** sobre el óptimo global o sobre el alfa aparece su etiqueta con el
+valor, y el cursor cambia de forma para avisar que hay algo que consultar.
+
 `X_α` es la posición recordada del récord, no un lobo. Coincide con el lobo
 alfa mientras la manada explota, pero al explorar el lobo se va y la memoria
 queda atrás. Solo entonces aparece marcada aparte, con un anillo punteado
