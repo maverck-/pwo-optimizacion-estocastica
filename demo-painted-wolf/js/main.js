@@ -29,6 +29,15 @@ const FASE_MOV = 0.78;
 // candidato parpadea y el alfa saliente pierde su luz. Se acorta con la
 // velocidad para que a 20× no frene la corrida.
 const RELEVO_SEG = 1.1;
+
+// Compás corto cuando el récord mejora sin cambiar de dueño: un solo parpadeo,
+// porque si no el cambio de posición del alfa pasaba desapercibido.
+const MEJORA_SEG = 0.45;
+
+// El récord mejora unas treinta veces por corrida, pero casi siempre por
+// milésimas: el alfa se desplaza menos de un píxel. Bajo este umbral no se abre
+// compás, porque no habría nada que ver y la corrida quedaría a tirones.
+const DESPLAZAMIENTO_VISIBLE = 0.05;
 const MULTIPLICADORES = [1, 2, 5, 20];
 
 // Paleta del pelaje: de los valles buenos (negro) a las cumbres malas (crema)
@@ -72,9 +81,10 @@ let tintes = [];             // tinte fijo por agente, para el pelaje moteado
 
 let historial = [];          // { mejor, modo } por iteración
 let mejorInicial = 1;        // normaliza la curva de convergencia
-let alfaAnterior = null;     // { pos, costo } del alfa que acaba de perder el puesto
+let alfaAnterior = null;     // { indice, pos, costo } del alfa que perdió el puesto
 let pausaRelevo = 0;         // segundos que restan del compás de relevo
 let relevoTotal = 0;         // duración de ese compás, para calcular el progreso
+let tipoRelevo = null;       // 'cambio' si el alfa cambió de dueño, 'mejora' si solo se movió
 
 let modo = 'listo';          // listo | ejecucion | pausado | detenido
 let velIndice = 0;
@@ -158,6 +168,7 @@ function reiniciar({ nuevoPaisaje = false } = {}) {
   alfaAnterior = null;
   pausaRelevo = 0;
   relevoTotal = 0;
+  tipoRelevo = null;
   faseIter = 0;
   fijarVelocidad(0); // toda corrida nueva parte lenta, a 1×
   cambiarModo('listo');
@@ -181,14 +192,26 @@ function ejecutarIteracion() {
   previas = ultima.previas;
   actuales = est.posiciones.map((p) => p.slice());
 
-  // Relevo: otro agente tomó el puesto de alfa. Se abre un compás para que se
-  // note, más corto cuanto mayor sea la velocidad de reproducción.
-  if (est.alfaIndice !== alfaAntes && est.alfaCosto < costoAntes) {
-    alfaAnterior = Number.isFinite(costoAntes)
-      ? { indice: alfaAntes, pos: posAntes, costo: costoAntes }
-      : null;
-    relevoTotal = RELEVO_SEG / MULTIPLICADORES[velIndice];
-    pausaRelevo = relevoTotal;
+  // Compás para que el cambio del alfa se note. Tres casos:
+  // cambió de dueño (parpadeo largo y el saliente se apaga), el mismo lobo
+  // mejoró y el alfa se movió (un único guiño), o la mejora es tan pequeña que
+  // el alfa no se movió en pantalla (no se abre compás).
+  if (est.alfaCosto < costoAntes) {
+    const primera = !Number.isFinite(costoAntes);
+    const corrido = Math.hypot(
+      est.alfaPos[0] - posAntes[0],
+      est.alfaPos[1] - posAntes[1],
+    );
+
+    if (primera || corrido >= DESPLAZAMIENTO_VISIBLE) {
+      const cambioDueno = primera || est.alfaIndice !== alfaAntes;
+      tipoRelevo = cambioDueno ? 'cambio' : 'mejora';
+      alfaAnterior = cambioDueno && !primera
+        ? { indice: alfaAntes, pos: posAntes, costo: costoAntes }
+        : null;
+      relevoTotal = (cambioDueno ? RELEVO_SEG : MEJORA_SEG) / MULTIPLICADORES[velIndice];
+      pausaRelevo = relevoTotal;
+    }
   }
 
   if (historial.length === 0) mejorInicial = Math.max(est.alfaCosto, 1e-9);
@@ -442,8 +465,10 @@ function dibujar() {
   const pMov = suavizar(clamp((fase - FASE_VOTO) / (FASE_MOV - FASE_VOTO), 0, 1));
 
   // Compás de relevo del alfa: 0 al abrirse, 1 al cerrarse
-  const enRelevo = pausaRelevo > 0 && relevoTotal > 0;
-  const pRelevo = enRelevo ? clamp(1 - pausaRelevo / relevoTotal, 0, 1) : 1;
+  const enCompas = pausaRelevo > 0 && relevoTotal > 0;
+  const pRelevo = enCompas ? clamp(1 - pausaRelevo / relevoTotal, 0, 1) : 1;
+  const enRelevo = enCompas && tipoRelevo === 'cambio';
+  const enMejora = enCompas && tipoRelevo === 'mejora';
 
   const enDominio = (q) => [
     clamp(q[0], DOMINIO.lb, DOMINIO.ub),
@@ -502,10 +527,12 @@ function dibujar() {
   const iAlfa = hayAlfa ? est.alfaIndice : -1;
   const iSaliente = enRelevo && alfaAnterior ? alfaAnterior.indice : -1;
 
-  // Parpadeo del entrante y apagado del saliente durante el compás de relevo
-  const parpadeo = enRelevo && pRelevo < 0.66
-    ? 0.3 + 0.7 * Math.abs(Math.sin(pRelevo * 11))
-    : 1;
+  // Relevo de dueño: varios parpadeos y el color se enciende de a poco.
+  // Mejora del mismo lobo: un solo guiño, se apaga y vuelve.
+  let parpadeo = 1;
+  if (enRelevo && pRelevo < 0.66) parpadeo = 0.3 + 0.7 * Math.abs(Math.sin(pRelevo * 11));
+  else if (enMejora) parpadeo = 1 - 0.8 * Math.sin(pRelevo * Math.PI);
+
   const encendido = enRelevo ? clamp(pRelevo / 0.7, 0, 1) : 1;
   const luzSaliente = enRelevo ? 1 - pRelevo : 0;
 

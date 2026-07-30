@@ -26,10 +26,22 @@ narrar paso a paso:
 3. **Asentarse.** Una pausa breve con todo quieto, para alcanzar a leer el
    cambio antes de la iteración siguiente.
 
-Cuando el alfa cambia de dueño se abre un compás extra: la simulación se
-detiene, el lobo entrante **parpadea** antes de tomar el color del alfa y el
-saliente **pierde su luz** y vuelve al crema de la manada. La manada siempre
-tiene `N` miembros: el alfa es un color, no una bola aparte.
+Cuando el récord mejora se abre un compás extra donde la simulación se detiene,
+con dos formas según lo que pasó:
+
+- **Cambió de dueño**: el lobo entrante **parpadea varias veces** antes de tomar
+  el color del alfa, y el saliente **pierde su luz** y vuelve al crema de la
+  manada.
+- **El mismo lobo mejoró su récord** y el alfa se movió de sitio: un **único
+  guiño**, más corto, que basta para notar el desplazamiento.
+
+Si la mejora es tan pequeña que el alfa no se mueve ni un píxel no se abre
+compás alguno. Eso pasa seguido: el récord mejora unas treinta veces por
+corrida, pero la mediana del desplazamiento es de 0.004 unidades del dominio, y
+detenerse ahí dejaría la corrida a tirones sin nada que mostrar. Con el filtro,
+la pausa acumulada baja de 34 s a unos 8 s por corrida a 1×.
+
+La manada siempre tiene `N` miembros: el alfa es un color, no una bola aparte.
 
 La escena no lleva rótulos fijos para no estorbar el movimiento. Al **pasar el
 cursor** sobre el óptimo global o sobre el alfa aparece su etiqueta con el
