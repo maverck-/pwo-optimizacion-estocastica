@@ -53,7 +53,10 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 
 // ————— Estado —————
 
-const params = { n: 24, T: 200, c: VOTO };
+// N por defecto en 8 y no en 24: con manadas grandes la muestra inicial ya cae
+// cerca del óptimo (23 % de las veces con N = 24) y la corrida se resuelve en
+// dos o tres iteraciones, sin que se alcance a ver el algoritmo trabajar.
+const params = { n: 8, T: 200, c: VOTO };
 
 let paisaje = crearTerreno();
 // Rama de exploración. Por defecto la variante por componente, porque la
