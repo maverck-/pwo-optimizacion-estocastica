@@ -43,8 +43,8 @@ const INTENTOS = 120;
  */
 export const DIFICULTADES = [
   {
-    id: 'suave',
-    nombre: 'Suave',
+    id: 'facil',
+    nombre: 'Fácil',
     sGlobal: [0.95, 1.40],
     fondoLoc: [0.45, 0.70],
     extra: [2, 3],
@@ -65,8 +65,8 @@ export const DIFICULTADES = [
     senuelo: false,
   },
   {
-    id: 'dura',
-    nombre: 'Dura',
+    id: 'dificil',
+    nombre: 'Difícil',
     sGlobal: [0.42, 0.62],
     fondoLoc: [0.86, 0.96],
     extra: [5, 8],

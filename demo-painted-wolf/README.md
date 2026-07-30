@@ -92,7 +92,7 @@ nada de dibujo.
 | **N** | Tamaño de la manada: soluciones candidatas simultáneas |
 | **T** | Máximo de iteraciones, criterio de parada |
 | **c** | Incremento de voto: cuánto aporta cada lobo al rally |
-| **Terreno** | Nivel de dificultad del paisaje: Suave, Media o Dura |
+| **Terreno** | Nivel de dificultad del paisaje: Fácil, Media o Difícil |
 
 Barra inferior izquierda: **Play/Pausa**, **velocidad 1× / 2× / 5× / 20×**
 (toda corrida nueva parte en 1× para seguir el paso a paso con calma),
@@ -114,12 +114,11 @@ f(x,y) = 0.055 (x² + y²) − Σ dₖ · exp( −‖(x,y) − cₖ‖² / 2σ�
 La cuenca hace que los bordes sean malos y las gaussianas producen los valles.
 La generación se valida por rechazo para garantizar tres cosas:
 
-- **un solo mínimo global**, con al menos un 8 % del rango de ventaja sobre el
-  segundo mejor, así nunca hay ambigüedad sobre cuál es el objetivo;
-- **entre 2 y 4 mínimos locales** con el 55 % al 86 % de la profundidad del
-  global, lo bastante competitivos para servir de trampa;
-- el óptimo global **en la banda central**, para que no quede tapado por las
-  tarjetas flotantes.
+- **un solo mínimo global**, con una ventaja mínima sobre el segundo mejor que
+  depende del nivel, así nunca hay ambigüedad sobre cuál es el objetivo;
+- **varios mínimos locales** lo bastante competitivos para servir de trampa;
+- el óptimo global **dentro de la banda visible**, para que no quede tapado por
+  las tarjetas flotantes.
 
 El terreno se desplaza para que el mínimo global valga exactamente 0, la misma
 convención de las funciones de prueba del paper.
@@ -133,11 +132,11 @@ la cuenca decidía las profundidades reales en vez del diseño.
 
 | Nivel | Pozo global | Fondo de los locales | Locales | Señuelo central |
 |---|---|---|---|---|
-| Suave | ancho, cerca del centro | 45 % a 70 % del global | 2 a 3 | no |
+| Fácil | ancho, cerca del centro | 45 % a 70 % del global | 2 a 3 | no |
 | Media | intermedio | 70 % a 88 % | 3 a 5 | no |
-| Dura | estrecho, descentrado | 86 % a 96 % | 5 a 8 | sí |
+| Difícil | estrecho, descentrado | 86 % a 96 % | 5 a 8 | sí |
 
-El nivel Dura agrega un **señuelo**: un pozo ancho y profundo junto al centro,
+El nivel Difícil agrega un **señuelo**: un pozo ancho y profundo junto al centro,
 donde la cuenca ya empuja a la manada, mientras el óptimo real queda
 descentrado y estrecho. El terreno miente sobre dónde conviene buscar.
 
@@ -145,9 +144,9 @@ Medido con N = 8, T = 200 y 100 corridas por nivel:
 
 | Nivel | Halla el global | Queda atrapado | Iteraciones p25 / mediana / p75 |
 |---|---|---|---|
-| Suave | 99 % | 1 % | 4 / 6 / 12 |
+| Fácil | 99 % | 1 % | 4 / 6 / 12 |
 | Media | 86 % | 14 % | 4 / 8 / 15 |
-| Dura | 60 % | 40 % | 5 / 11 / 23 |
+| Difícil | 60 % | 40 % | 5 / 11 / 23 |
 
 ## Variante de exploración
 
