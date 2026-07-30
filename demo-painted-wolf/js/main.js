@@ -268,43 +268,6 @@ function construirMapa(g) {
   return mapa;
 }
 
-// ————— Etiquetas tipo tag, como en las láminas del curso —————
-
-const FUENTE_ETIQUETA = '13px "Geist Mono", ui-monospace, Menlo, monospace';
-const FUENTE_VALOR = '600 16px "Geist Mono", ui-monospace, Menlo, monospace';
-
-function dibujarTag(etiqueta, valor, cx, cy) {
-  ctx.font = FUENTE_ETIQUETA;
-  const anchoEtiqueta = ctx.measureText(etiqueta).width;
-  ctx.font = FUENTE_VALOR;
-  const anchoValor = valor ? ctx.measureText(valor).width : 0;
-  const ancho = anchoEtiqueta + anchoValor + 24;
-  const alto = 28;
-  const x = cx - ancho / 2;
-  const y = cy - alto;
-
-  ctx.beginPath();
-  if (ctx.roundRect) ctx.roundRect(x, y, ancho, alto, 8);
-  else ctx.rect(x, y, ancho, alto);
-  ctx.fillStyle = 'rgba(12,10,8,0.72)';
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(242,233,221,0.28)';
-  ctx.lineWidth = 1;
-  ctx.stroke();
-
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
-  ctx.font = FUENTE_ETIQUETA;
-  ctx.fillStyle = 'rgba(242,233,221,0.88)';
-  ctx.fillText(etiqueta, x + 12, y + alto / 2 + 0.5);
-  if (valor) {
-    ctx.font = FUENTE_VALOR;
-    ctx.fillStyle = 'rgba(242,233,221,1)';
-    ctx.fillText(valor, x + 12 + anchoEtiqueta, y + alto / 2 + 0.5);
-  }
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'alphabetic';
-}
 
 // ————— Render de la escena —————
 
@@ -354,8 +317,7 @@ function dibujar() {
     ctx.lineTo(ox, oy + 14);
     ctx.stroke();
   }
-  const [optX, optY] = aPantalla(paisaje.optimos[0], g);
-  dibujarTag('Óptimo Global: ', '0.0000', optX, optY - 18);
+  // Sin rótulo: la cruz basta y no estorba el movimiento de la manada
 
   if (!est) return;
 
@@ -515,17 +477,7 @@ function dibujar() {
       ctx.lineTo(alfaX, alfaY);
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.font = '11px "Geist Mono", ui-monospace, Menlo, monospace';
-      ctx.fillStyle = 'rgba(255,196,107,0.85)';
-      ctx.fillText('Xα recordado', alfaX, alfaY - radio * 1.9);
     }
-
-    dibujarTag(
-      enRelevo ? 'Xα nuevo: ' : 'Xα: ',
-      recortar(est.alfaCosto, 4),
-      ax,
-      ay - radio * 2.6,
-    );
   }
 }
 
