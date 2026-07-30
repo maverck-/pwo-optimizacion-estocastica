@@ -24,7 +24,7 @@ se desarrollarán para la entrega final.
 
 ```text
 .
-├── demo-web/             # Laboratorio visual e interactivo de PWO
+├── demo-painted-wolf/    # Demo visual e interactiva de PWO
 ├── docs/
 │   ├── informe/          # Fuente Markdown del paper
 │   └── presentacion/     # Contenido y guion
@@ -65,22 +65,26 @@ La presentación editable y las copias listas para revisión se encuentran en
 
 ## Demo web interactiva
 
-`demo-web/` contiene una aplicación Next.js independiente que permite observar
-el movimiento de la población, el alfa histórico, la transición entre
-exploración y explotación, y el papel de `R` y `H`. También permite alternar
-entre las analogías de lobos y pelotas, y comparar minimización con
-maximización.
+`demo-painted-wolf/` contiene una demo independiente que muestra la manada
+sobre un mapa de calor visto desde arriba: el alfa histórico, la votación del
+rally, la comparación entre `R` y `H`, y la elección entre exploración y
+explotación. Comparte el sistema visual de la demo de recocido simulado de la
+Actividad 1, de modo que ambas se pueden presentar seguidas.
 
-Para ejecutarla localmente:
+No usa dependencias ni build. Al usar módulos ES necesita un servidor, no basta
+abrir el archivo:
 
 ```bash
-cd demo-web
-npm install
-npm run dev
+cd demo-painted-wolf
+python3 -m http.server 8000
 ```
 
-Para publicarla en Vercel, importa este repositorio y configura `demo-web` como
-**Root Directory**. No requiere variables de entorno.
+Para publicarla en Vercel, importa este repositorio y configura
+`demo-painted-wolf` como **Root Directory**. No requiere variables de entorno
+ni comando de build.
+
+El detalle de la correspondencia con las ecuaciones del informe está en
+`demo-painted-wolf/README.md`.
 
 ## Estado
 

@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Painted Wolf Optimization — MII902</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%23ff9c3f'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/estilo.css" />
+</head>
+<body>
+  <canvas id="escena" aria-label="Simulación de Painted Wolf Optimization: una manada de agentes recorre un mapa de calor buscando el mínimo de la función objetivo"></canvas>
+
+  <nav class="transporte" aria-label="Controles de reproducción">
+    <button id="btn-play" class="btn-redondo btn-play" title="Iniciar / pausar (espacio)" aria-label="Iniciar o pausar">
+      <svg id="icono-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+      <svg id="icono-pausa" class="oculto" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>
+    </button>
+    <button id="btn-vel" class="btn-vel mono" title="Velocidad de reproducción (V)" aria-label="Cambiar velocidad">1×</button>
+    <button id="btn-reiniciar" class="btn-redondo" title="Reiniciar (R)" aria-label="Reiniciar">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg>
+    </button>
+    <span class="separador" role="presentation"></span>
+    <button id="btn-paisaje" class="btn-redondo btn-sec" title="Nuevo terreno (N)" aria-label="Nuevo terreno">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6l-3.7 4.9 2.8 3.7-1.6 1.2L8 11 2 19h20L14 6z"/></svg>
+    </button>
+    <button id="btn-variante" class="btn-redondo btn-sec" title="Rama de exploración: literal del paper o por componente (E)" aria-label="Cambiar variante de exploración">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v10.2a3 3 0 1 0 2 0V3H7zm10 0v6.2a3 3 0 1 0 2 0V3h-2z"/></svg>
+    </button>
+    <span class="info-wrap">
+    <button id="btn-info" class="btn-redondo btn-sec" title="Simbología" aria-expanded="false" aria-controls="simbolos">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+    </button>
+    <section class="simbolos oculto" id="simbolos" aria-label="Simbología">
+      <p class="etiqueta">Simbología</p>
+      <ul>
+        <li><span class="tag">F</span><span>Función objetivo: la altura del terreno, PWO busca su mínimo</span></li>
+        <li><span class="tag">N</span><span>Tamaño de la manada: soluciones candidatas simultáneas</span></li>
+        <li><span class="tag">X<sub>i</sub></span><span>Posición del agente i: una solución del problema</span></li>
+        <li><span class="tag">X<sub>α</sub></span><span>Alfa: la mejor solución encontrada hasta ahora</span></li>
+        <li><span class="tag">t, T</span><span>Iteración actual y máximo de iteraciones (parada)</span></li>
+        <li><span class="tag tag-formula">a(t) = 2(1 − t/T)</span><span>Parámetro de control: baja de 2 a 0 durante la corrida</span></li>
+        <li><span class="tag">c</span><span>Incremento de voto: cuánto aporta cada lobo al rally</span></li>
+        <li><span class="tag tag-formula">L(t) = |c / a(t)|</span><span>Influencia del alfa: crece a medida que a(t) baja</span></li>
+        <li><span class="tag tag-formula">R = c · votos</span><span>Fuerza del rally: vota quien cumple F<sub>i</sub> − L·F<sub>α</sub> ≤ F<sub>α</sub></span></li>
+        <li><span class="tag tag-formula">H = round(a(2r₃ − r₄)/L + r₄)</span><span>Umbral estocástico contra el que se compara el rally</span></li>
+        <li><span class="tag">R &lt; H</span><span>Decisión global: si se cumple la manada explora, si no explota</span></li>
+        <li><span class="tag tag-formula">A₂ = R + a·A₁·L</span><span>Coeficiente que acerca cada agente al alfa en explotación</span></li>
+      </ul>
+
+      <p class="etiqueta">Cómo leer la escena</p>
+      <ul>
+        <li><span class="pista pista-vota"></span><span>Anillo verde: el agente cumple la condición del voto y aporta al rally</span></li>
+        <li><span class="pista pista-novota"></span><span>Anillo rojo: su fitness no alcanza el umbral, no vota</span></li>
+        <li><span class="pista pista-rally"></span><span>Trazo hacia el alfa: el rally formándose en la primera mitad de la iteración</span></li>
+        <li><span class="pista pista-salto"></span><span>Línea de salto: el desplazamiento del agente en esta iteración, con el color del modo</span></li>
+        <li><span class="pista pista-relevo"></span><span>Destello blanco: otro agente tomó el puesto de alfa</span></li>
+      </ul>
+    </section>
+    </span>
+  </nav>
+
+  <header class="titulo-caja">
+    <h1>Painted Wolf Optimization</h1>
+  </header>
+
+  <section class="hud" aria-label="Estado de la simulación">
+    <div class="hud-temp">
+      <div class="hud-temp-cab">
+        <div class="hud-bloque">
+          <span class="etiqueta">Iteración <span class="tag">t</span></span>
+          <span class="mono grande blanco" id="d-iter">0/200</span>
+        </div>
+        <div class="hud-bloque hud-bloque-der">
+          <span class="etiqueta">Control <span class="tag">a(t)</span></span>
+          <span class="mono grande" id="d-a">2.0000</span>
+        </div>
+      </div>
+      <div class="gauge" role="presentation"><div class="gauge-fill" id="gauge-fill"></div></div>
+    </div>
+
+    <div class="formula">
+      <span class="etiqueta">Rally de votación <span class="tag">F<sub>i</sub> − L·F<sub>α</sub> ≤ F<sub>α</sub></span></span>
+      <div class="evaluacion">
+        <div class="eval-celda">
+          <span class="eval-etiqueta">Fuerza <span class="tag tag-formula">R = c·votos</span></span>
+          <span class="mono eval-valor" id="eval-r">—</span>
+        </div>
+        <div class="eval-celda">
+          <span class="eval-etiqueta">Umbral <span class="tag">H</span></span>
+          <span class="mono eval-valor" id="eval-h">—</span>
+        </div>
+        <div class="eval-celda eval-celda-veredicto">
+          <span class="tag eval-comparacion">R &lt; H</span>
+          <span class="veredicto veredicto-neutro" id="eval-modo">Esperando</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hud-pie">
+      <div class="hud-dato">
+        <span class="etiqueta">Votos</span>
+        <span class="mono hud-dato-valor" id="d-votos">0 / 0</span>
+      </div>
+      <div class="hud-dato">
+        <span class="etiqueta">Influencia <span class="tag">L</span></span>
+        <span class="mono hud-dato-valor" id="d-l">0.0200</span>
+      </div>
+      <div class="hud-dato">
+        <span class="etiqueta">Mejor <span class="tag">F(X<sub>α</sub>)</span></span>
+        <span class="mono hud-dato-valor destacado" id="d-alfa">—</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="grafica-caja" aria-label="Convergencia de la búsqueda">
+    <div class="grafica-cab">
+      <span class="etiqueta">Convergencia</span>
+      <span class="mono grafica-paisaje" id="d-paisaje">Valle</span>
+    </div>
+    <canvas id="grafico" height="64" aria-label="Curva del mejor valor encontrado por iteración"></canvas>
+    <p class="leyenda">
+      <span class="clave clave-mejor">mejor F</span>
+      <span class="clave clave-explora">explora</span>
+      <span class="clave clave-explota">explota</span>
+    </p>
+  </section>
+
+  <aside class="panel" aria-label="Parámetros del algoritmo">
+    <div class="control">
+      <label for="in-n">Manada
+        <span class="control-simbolo-valor"><span class="tag">N</span>
+          <output class="mono" id="out-n">24</output></span>
+      </label>
+      <input type="range" id="in-n" min="4" max="60" step="1" value="24" />
+    </div>
+
+    <div class="control">
+      <label for="in-t">Iteraciones
+        <span class="control-simbolo-valor"><span class="tag">T</span>
+          <output class="mono" id="out-t">200</output></span>
+      </label>
+      <input type="range" id="in-t" min="50" max="1000" step="10" value="200" />
+    </div>
+
+    <div class="control">
+      <label for="in-c">Voto
+        <span class="control-simbolo-valor"><span class="tag">c</span>
+          <output class="mono" id="out-c">0.040</output></span>
+      </label>
+      <input type="range" id="in-c" min="0.005" max="0.2" step="0.005" value="0.04" />
+    </div>
+  </aside>
+
+  <a class="credito" href="https://github.com/maverck-/simulated-annealing" target="_blank" rel="noopener">
+    <svg class="credito-icono" viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 3.25a2.25 2.25 0 1 1 3 2.122V6A2.5 2.5 0 0 1 10 8.5H6a1 1 0 0 0-1 1v1.128a2.251 2.251 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.5 0v1.836A2.493 2.493 0 0 1 6 7h4a1 1 0 0 0 1-1v-.628a2.25 2.25 0 0 1-1.5-2.122Zm-6 0a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Zm8.25-.75a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5ZM4.25 12a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Z"/></svg>
+    Por Maverick Gayoso
+  </a>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
