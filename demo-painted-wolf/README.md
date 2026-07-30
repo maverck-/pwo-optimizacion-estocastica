@@ -35,10 +35,23 @@ La escena no lleva rótulos fijos para no estorbar el movimiento. Al **pasar el
 cursor** sobre el óptimo global o sobre el alfa aparece su etiqueta con el
 valor, y el cursor cambia de forma para avisar que hay algo que consultar.
 
-`X_α` es la posición recordada del récord, no un lobo. Coincide con el lobo
-alfa mientras la manada explota, pero al explorar el lobo se va y la memoria
-queda atrás. Solo entonces aparece marcada aparte, con un anillo punteado
-rotulado `Xα recordado`, unido por una línea al lobo que la consiguió.
+## El anillo punteado
+
+`X_α` es la posición **recordada** del récord, no un lobo. Coincide con el lobo
+alfa mientras la manada explota, porque en la ecuación 17 la distancia al alfa
+del propio alfa vale cero y se queda clavado. Pero al explorar el lobo se va y
+la memoria queda atrás: entonces aparece el anillo punteado, unido por una
+línea al lobo que consiguió ese récord.
+
+Importa para el algoritmo, no es decoración: **todas las ecuaciones de
+movimiento usan `X_α`**, la coordenada recordada, no la posición actual del
+lobo que la encontró. Durante la explotación la manada converge hacia el
+anillo punteado, no hacia la bola naranja. La línea es el recordatorio de esa
+distinción.
+
+El anillo aparece y se va de forma gradual según cuánto se haya separado el
+lobo, y cuando cambia el récord el anillo viejo se apaga junto con el compás
+del relevo en vez de desaparecer de golpe.
 
 ## Cómo ejecutar
 

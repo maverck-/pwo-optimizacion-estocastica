@@ -373,6 +373,27 @@ function dibujar() {
   const radio = clamp(Math.min(W, H) * 0.0075, 5, 9);
   const fase = reduceMotion ? 1 : clamp(faseIter, 0, 1);
 
+  /** Cuánto se distingue el X_alfa recordado del lobo que lo consiguió:
+      0 cuando están encima, 1 cuando ya están claramente separados */
+  const separacion = (mx, my, lx, ly) =>
+    clamp((Math.hypot(mx - lx, my - ly) - radio * 1.6) / (radio * 2.6), 0, 1);
+
+  /** Anillo punteado del récord recordado, unido al lobo que lo encontró */
+  const dibujarRecordado = (mx, my, lx, ly, op) => {
+    if (op <= 0.02) return;
+    ctx.setLineDash([3, 3]);
+    ctx.strokeStyle = `rgba(255,196,107,${0.75 * op})`;
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.arc(mx, my, radio * 1.2, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(lx, ly);
+    ctx.lineTo(mx, my);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  };
+
   // Tres tiempos por iteración: votar quieto, moverse y asentarse
   const votando = fase < FASE_VOTO;
   const pVoto = votando ? fase / FASE_VOTO : 1;
@@ -511,22 +532,23 @@ function dibujar() {
   if (iAlfa >= 0) {
     const [ax, ay] = aPantalla(vistas[iAlfa], g);
 
+    // El X_alfa recordado del alfa saliente se apaga junto con el relevo,
+    // en vez de esfumarse de golpe cuando cambia el récord
+    if (enRelevo && alfaAnterior) {
+      const [vax, vay] = aPantalla(enDominio(alfaAnterior.pos), g);
+      const [vlx, vly] = aPantalla(vistas[alfaAnterior.indice], g);
+      const op = separacion(vax, vay, vlx, vly) * (1 - pRelevo);
+      dibujarRecordado(vax, vay, vlx, vly, op);
+    }
+
     // X_alfa es la posición recordada del récord. Coincide con el lobo alfa
     // mientras explota, pero al explorar el lobo se va y la memoria queda.
-    // Solo entonces se marca aparte, con un anillo hueco que no es un lobo.
-    if (Math.hypot(alfaX - ax, alfaY - ay) > radio * 2) {
-      ctx.setLineDash([3, 3]);
-      ctx.strokeStyle = 'rgba(255,196,107,0.75)';
-      ctx.lineWidth = 1.4;
-      ctx.beginPath();
-      ctx.arc(alfaX, alfaY, radio * 1.2, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(ax, ay);
-      ctx.lineTo(alfaX, alfaY);
-      ctx.stroke();
-      ctx.setLineDash([]);
+    // El anillo aparece y se va con la separación, sin cortes bruscos.
+    const visible = separacion(alfaX, alfaY, ax, ay);
+    dibujarRecordado(alfaX, alfaY, ax, ay, visible);
 
+    // Solo se puede consultar cuando ya se distingue de la bola del alfa
+    if (visible > 0.35) {
       hover.push({
         x: alfaX,
         y: alfaY,
