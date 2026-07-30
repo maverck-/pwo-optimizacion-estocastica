@@ -49,10 +49,14 @@ body {
 
 /* ————— Barra de transporte ————— */
 
+/* Capas: la escena al fondo, las tarjetas encima y la barra de transporte por
+   sobre todas, para que el panel de simbología que se despliega desde ella no
+   quede tapado por el panel de parámetros. */
 .transporte {
   position: fixed;
   left: 24px;
   bottom: 24px;
+  z-index: 20;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -158,6 +162,7 @@ body {
 
 .hud, .panel, .grafica-caja, .titulo-caja {
   position: fixed;
+  z-index: 10;
   background: var(--papel);
   border: 1px solid var(--borde);
   border-radius: var(--radio);
@@ -492,8 +497,10 @@ input[type="range"]:focus-visible {
   position: absolute;
   bottom: calc(100% + 12px);
   left: 0;
-  right: 0;
-  width: auto;
+  /* Más ancho que la barra: con dieciséis entradas las líneas se partían */
+  width: min(540px, calc(100vw - 48px));
+  max-height: calc(100vh - 130px);
+  overflow-y: auto;
   padding: 16px 18px;
   display: grid;
   gap: 12px;
