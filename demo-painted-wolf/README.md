@@ -25,7 +25,9 @@ narrar paso a paso:
 
 1. **Votar.** La manada se queda quieta. Cada lobo compara su `F` contra el
    alfa: anillo verde si cumple `F_i − L·F_α ≤ F_α` y aporta al rally, anillo
-   rojo si no alcanza. Los votantes lanzan un trazo hacia el alfa.
+   rojo si no alcanza. Los votantes lanzan un trazo hacia el alfa y, una vez que
+   los trazos llegan, **todo se detiene un momento** con los anillos y el valor
+   de `R` a la vista. Sin esa pausa la votación ocurría en un parpadeo.
 2. **Mover.** Una flecha por lobo apuntando **adónde va**, con el color del modo
    elegido: frío si exploró, cálido si explotó. La flecha aparece completa al
    empezar el movimiento, así que anuncia el destino antes de que el lobo

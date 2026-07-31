@@ -19,15 +19,18 @@ const BANDAS = 15;          // niveles del mapa de calor, da aspecto topográfic
 const PASO_MAPA = 3;        // píxeles por muestra al construir el mapa
 // Iteraciones por segundo a 1×. Como los multiplicadores escalan esta base,
 // bajarla alarga todas las velocidades en la misma proporción.
-const VEL_BASE = 0.9;
+const VEL_BASE = 0.78;
 
 // Cada iteración se lee en tres tiempos: la manada evalúa y vota quieta, luego
 // se mueve, y al final se asienta. Ese último compás deja notar el cambio de
 // posición antes de que empiece la iteración siguiente.
-// El reparto favorece al desplazamiento, que es lo que cuesta seguir: casi la
-// mitad de la iteración se va en el recorrido.
-const FASE_VOTO = 0.34;
-const FASE_MOV = 0.82;
+// Reparto de la iteración. La fase de voto tiene dos partes: el trazo de los
+// votantes crece hasta VOTO_TRAZO y después todo queda detenido hasta
+// FASE_VOTO, con los anillos y el valor de R a la vista. Esa pausa es la que
+// deja apreciar la votación, que si no ocurría en un parpadeo.
+const VOTO_TRAZO = 0.20;
+const FASE_VOTO = 0.44;
+const FASE_MOV = 0.86;
 
 // Compás extra cuando el alfa cambia de dueño: la simulación se detiene, el
 // candidato parpadea y el alfa saliente pierde su luz. Se acorta con la
@@ -509,7 +512,8 @@ function dibujar() {
 
   // Tres tiempos por iteración: votar quieto, moverse y asentarse
   const votando = fase < FASE_VOTO;
-  const pVoto = votando ? fase / FASE_VOTO : 1;
+  // El trazo llega al alfa antes de que termine la fase: el resto es la pausa
+  const pVoto = clamp(fase / VOTO_TRAZO, 0, 1);
   const pMov = suavizar(clamp((fase - FASE_VOTO) / (FASE_MOV - FASE_VOTO), 0, 1));
 
   // Compás de relevo del alfa: 0 al abrirse, 1 al cerrarse
