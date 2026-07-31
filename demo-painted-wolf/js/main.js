@@ -337,6 +337,54 @@ function dibujarTag(etiqueta, valor, cx, cy, W) {
   ctx.textBaseline = 'alphabetic';
 }
 
+/**
+ * Flecha del origen al destino del salto. La punta queda antes del destino,
+ * para que no la tape el lobo al llegar. Si el salto es muy corto se dibuja
+ * solo un punto: una flecha con la punta más larga que el cuerpo confunde.
+ */
+function dibujarFlecha(ax, ay, bx, by, color, radio) {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const largo = Math.hypot(dx, dy);
+
+  if (largo < radio * 1.2) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(bx, by, 2.2, 0, Math.PI * 2);
+    ctx.fill();
+    return;
+  }
+
+  const ux = dx / largo;
+  const uy = dy / largo;
+  const punta = Math.min(9, largo * 0.28);
+  // El cuerpo termina donde empieza la punta, y la punta antes del lobo
+  const fin = largo - radio * 0.9;
+  const px = ax + ux * fin;
+  const py = ay + uy * fin;
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.3;
+  ctx.beginPath();
+  ctx.moveTo(ax, ay);
+  ctx.lineTo(px - ux * punta * 0.6, py - uy * punta * 0.6);
+  ctx.stroke();
+
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(px, py);
+  ctx.lineTo(px - ux * punta + uy * punta * 0.45, py - uy * punta - ux * punta * 0.45);
+  ctx.lineTo(px - ux * punta - uy * punta * 0.45, py - uy * punta + ux * punta * 0.45);
+  ctx.closePath();
+  ctx.fill();
+
+  // Punto tenue en el origen, para no perder de dónde salió
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(ax, ay, 1.8, 0, Math.PI * 2);
+  ctx.fill();
+}
+
 const bajoElCursor = (px, py, radio) =>
   raton !== null && Math.hypot(raton.x - px, raton.y - py) <= radio;
 
@@ -497,23 +545,16 @@ function dibujar() {
     }
   }
 
-  // Tiempo 2: una línea por agente, su desplazamiento en esta iteración.
-  // El color dice qué ecuación lo movió: fría explora, cálida explota.
+  // Tiempo 2: una flecha por agente apuntando a DONDE VA, no a de dónde viene.
+  // Las tres ecuaciones asignan una coordenada absoluta, no un paso: PWO no
+  // tiene velocidad ni desplazamiento acumulado. Por eso la flecha se dibuja
+  // completa desde el inicio del movimiento, anunciando el destino, y el lobo
+  // recorre después. El color dice qué ecuación lo movió.
   if (ultima && !votando) {
-    ctx.lineWidth = 1.2;
     for (let i = 0; i < vistas.length; i += 1) {
       const [ax, ay] = aPantalla(enDominio(previas[i]), g);
-      const [bx, by] = aPantalla(vistas[i], g);
-      ctx.strokeStyle = colorModo(0.3);
-      ctx.beginPath();
-      ctx.moveTo(ax, ay);
-      ctx.lineTo(bx, by);
-      ctx.stroke();
-      // Punto tenue en el origen del salto, para ver de dónde vino
-      ctx.fillStyle = colorModo(0.28);
-      ctx.beginPath();
-      ctx.arc(ax, ay, 2.2, 0, Math.PI * 2);
-      ctx.fill();
+      const [bx, by] = aPantalla(enDominio(actuales[i]), g);
+      dibujarFlecha(ax, ay, bx, by, colorModo(0.34), radio);
     }
   }
 

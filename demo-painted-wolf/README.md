@@ -26,8 +26,12 @@ narrar paso a paso:
 1. **Votar.** La manada se queda quieta. Cada lobo compara su `F` contra el
    alfa: anillo verde si cumple `F_i − L·F_α ≤ F_α` y aporta al rally, anillo
    rojo si no alcanza. Los votantes lanzan un trazo hacia el alfa.
-2. **Mover.** Una línea por lobo con su desplazamiento en esta iteración, con
-   el color del modo elegido: frío si exploró, cálido si explotó.
+2. **Mover.** Una flecha por lobo apuntando **adónde va**, con el color del modo
+   elegido: frío si exploró, cálido si explotó. La flecha aparece completa al
+   empezar el movimiento, así que anuncia el destino antes de que el lobo
+   llegue. Va en ese sentido porque las tres ecuaciones **asignan una
+   coordenada absoluta**, no un paso: PWO no tiene velocidad ni desplazamiento
+   acumulado, de modo que lo significativo es el destino y no el origen.
 3. **Asentarse.** Una pausa breve con todo quieto, para alcanzar a leer el
    cambio antes de la iteración siguiente.
 
