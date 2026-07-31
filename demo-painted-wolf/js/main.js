@@ -356,23 +356,23 @@ function dibujar() {
   ctx.fillRect(0, 0, W, H);
 
   // Caja del dominio factible: fuera de ella las posiciones se saturan.
-  // Va marcada con fuerza porque es la frontera del problema, no un adorno.
+  // Va en blanco y discreta: delimita sin competir con la manada.
   const [x0, y0] = aPantalla([DOMINIO.lb, DOMINIO.ub], g);
   const lado = (DOMINIO.ub - DOMINIO.lb) * g.escala;
 
   ctx.save();
-  ctx.strokeStyle = 'rgba(255,196,107,0.55)';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([9, 6]);
-  ctx.shadowColor = 'rgba(0,0,0,0.55)';
-  ctx.shadowBlur = 6;
+  ctx.strokeStyle = 'rgba(242,233,221,0.3)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([7, 6]);
+  ctx.shadowColor = 'rgba(0,0,0,0.4)';
+  ctx.shadowBlur = 4;
   ctx.strokeRect(x0, y0, lado, lado);
   ctx.restore();
 
   // Escuadras en las esquinas, para leer la frontera de un vistazo
-  const esq = Math.min(26, lado * 0.06);
-  ctx.strokeStyle = 'rgba(255,214,150,0.9)';
-  ctx.lineWidth = 3;
+  const esq = Math.min(20, lado * 0.045);
+  ctx.strokeStyle = 'rgba(242,233,221,0.5)';
+  ctx.lineWidth = 1.5;
   for (const [ex, ey, sx, sy] of [
     [x0, y0, 1, 1],
     [x0 + lado, y0, -1, 1],
@@ -386,25 +386,21 @@ function dibujar() {
     ctx.stroke();
   }
 
-  // Rótulo del dominio sobre una píldora, para que se lea sobre cualquier tono
-  const rotulo = `dominio factible  [${DOMINIO.lb}, ${DOMINIO.ub}]²`;
-  ctx.font = '600 12px "Geist Mono", ui-monospace, Menlo, monospace';
-  const anchoRot = ctx.measureText(rotulo).width + 20;
-  const altoRot = 24;
-  const rx = x0 + 10;
-  const ry = y0 + lado - altoRot - 10;
-  ctx.beginPath();
-  if (ctx.roundRect) ctx.roundRect(rx, ry, anchoRot, altoRot, 7);
-  else ctx.rect(rx, ry, anchoRot, altoRot);
-  ctx.fillStyle = 'rgba(12,10,8,0.72)';
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(255,196,107,0.5)';
-  ctx.lineWidth = 1;
-  ctx.stroke();
+  // Rótulo del dominio: texto blanco tenue, sin píldora, con sombra para que
+  // se lea igual sobre los valles oscuros y sobre las cumbres claras
+  ctx.save();
+  ctx.font = '11.5px "Geist Mono", ui-monospace, Menlo, monospace';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  ctx.fillStyle = 'rgba(255,214,150,0.95)';
-  ctx.fillText(rotulo, rx + 10, ry + altoRot / 2 + 0.5);
+  ctx.shadowColor = 'rgba(0,0,0,0.75)';
+  ctx.shadowBlur = 5;
+  ctx.fillStyle = 'rgba(242,233,221,0.62)';
+  ctx.fillText(
+    `dominio factible  [${DOMINIO.lb}, ${DOMINIO.ub}]²`,
+    x0 + esq + 8,
+    y0 + lado - 11,
+  );
+  ctx.restore();
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
 
