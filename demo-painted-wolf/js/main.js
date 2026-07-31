@@ -550,6 +550,44 @@ function dibujar() {
   const [alfaX, alfaY] = aPantalla(enDominio(est.alfaPos), g);
   const votantes = ultima ? new Set(ultima.votantes) : null;
 
+  // El alfa es un color que lleva uno de los lobos, no una bola aparte: la
+  // manada siempre tiene N miembros, ninguno aparece ni desaparece.
+  const hayAlfa = Number.isFinite(est.alfaCosto);
+  const iAlfa = hayAlfa ? est.alfaIndice : -1;
+  const iSaliente = enRelevo && alfaAnterior ? alfaAnterior.indice : -1;
+
+  // Relevo de dueño: varios parpadeos y el color se enciende de a poco.
+  // Mejora del mismo lobo: un solo guiño, se apaga y vuelve.
+  let parpadeo = 1;
+  if (enRelevo && pRelevo < 0.66) parpadeo = 0.3 + 0.7 * Math.abs(Math.sin(pRelevo * 11));
+  else if (enMejora) parpadeo = 1 - 0.8 * Math.sin(pRelevo * Math.PI);
+
+  const encendido = enRelevo ? clamp(pRelevo / 0.7, 0, 1) : 1;
+  const luzSaliente = enRelevo ? 1 - pRelevo : 0;
+
+  const CREMA = (i) => [232 * tintes[i], 214 * tintes[i], 186 * tintes[i]];
+  const NARANJO = [255, 196, 107];
+
+  // Halo del alfa. Va lo primero de todo: si se dibuja después, su resplandor
+  // tapa la flecha del propio alfa y parece que fuera el único lobo sin flecha.
+  if (iAlfa >= 0) {
+    const [hx, hy] = aPantalla(vistas[iAlfa], g);
+    const hr = radio * (6 + (enRelevo ? (1 - pRelevo) * 4 : 0));
+    const halo = ctx.createRadialGradient(hx, hy, 0, hx, hy, hr);
+    halo.addColorStop(0, `rgba(255,156,63,${0.42 * parpadeo * encendido})`);
+    halo.addColorStop(1, 'rgba(255,156,63,0)');
+    ctx.fillStyle = halo;
+    ctx.fillRect(hx - hr, hy - hr, hr * 2, hr * 2);
+
+    if (enRelevo) {
+      ctx.strokeStyle = `rgba(255,244,214,${0.8 * (1 - pRelevo)})`;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(hx, hy, radio * (1.6 + pRelevo * 4.5), 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+
   // Tiempo 1: cada agente compara su F contra el alfa. Quien cumple la
   // condición del voto lanza un trazo verde que avanza hacia el alfa.
   if (ultima && votando) {
@@ -584,43 +622,6 @@ function dibujar() {
         colorModo(0.34),
         radio,
       );
-    }
-  }
-
-  // El alfa es un color que lleva uno de los lobos, no una bola aparte: la
-  // manada siempre tiene N miembros, ninguno aparece ni desaparece.
-  const hayAlfa = Number.isFinite(est.alfaCosto);
-  const iAlfa = hayAlfa ? est.alfaIndice : -1;
-  const iSaliente = enRelevo && alfaAnterior ? alfaAnterior.indice : -1;
-
-  // Relevo de dueño: varios parpadeos y el color se enciende de a poco.
-  // Mejora del mismo lobo: un solo guiño, se apaga y vuelve.
-  let parpadeo = 1;
-  if (enRelevo && pRelevo < 0.66) parpadeo = 0.3 + 0.7 * Math.abs(Math.sin(pRelevo * 11));
-  else if (enMejora) parpadeo = 1 - 0.8 * Math.sin(pRelevo * Math.PI);
-
-  const encendido = enRelevo ? clamp(pRelevo / 0.7, 0, 1) : 1;
-  const luzSaliente = enRelevo ? 1 - pRelevo : 0;
-
-  const CREMA = (i) => [232 * tintes[i], 214 * tintes[i], 186 * tintes[i]];
-  const NARANJO = [255, 196, 107];
-
-  // Halo del alfa, detrás de la manada
-  if (iAlfa >= 0) {
-    const [hx, hy] = aPantalla(vistas[iAlfa], g);
-    const hr = radio * (6 + (enRelevo ? (1 - pRelevo) * 4 : 0));
-    const halo = ctx.createRadialGradient(hx, hy, 0, hx, hy, hr);
-    halo.addColorStop(0, `rgba(255,156,63,${0.42 * parpadeo * encendido})`);
-    halo.addColorStop(1, 'rgba(255,156,63,0)');
-    ctx.fillStyle = halo;
-    ctx.fillRect(hx - hr, hy - hr, hr * 2, hr * 2);
-
-    if (enRelevo) {
-      ctx.strokeStyle = `rgba(255,244,214,${0.8 * (1 - pRelevo)})`;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(hx, hy, radio * (1.6 + pRelevo * 4.5), 0, Math.PI * 2);
-      ctx.stroke();
     }
   }
 
