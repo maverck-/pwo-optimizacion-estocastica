@@ -29,10 +29,11 @@ se mueve una sola, y el resto queda quieto.
    rojo si no alcanza. Los votantes lanzan un trazo hacia el alfa y, una vez que
    los trazos llegan, **todo se detiene un momento** con los anillos y el valor
    de `R` a la vista. Sin esa pausa la votación ocurría en un parpadeo.
-2. **Decidir.** Aparece una flecha por lobo apuntando **adónde va**, con el
-   color del modo elegido: frío si exploró, cálido si explotó. Durante este
-   tramo los lobos siguen quietos: primero se lee la decisión y solo después
-   viene la ejecución. La flecha apunta al destino porque las tres ecuaciones
+2. **Decidir.** Se traza una flecha por lobo apuntando **adónde va**, con el
+   color del modo elegido: frío si exploró, cálido si explotó. La flecha crece
+   desde el origen a la misma velocidad con que después avanzará el lobo, y
+   durante este tramo los lobos siguen quietos: primero se lee la decisión y
+   solo después viene la ejecución. La flecha apunta al destino porque las tres ecuaciones
    **asignan una coordenada absoluta**, no un paso: PWO no tiene velocidad ni
    desplazamiento acumulado, así que lo significativo es adónde va y no de
    dónde viene.

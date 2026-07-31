@@ -34,9 +34,12 @@ const VEL_BASE = 0.72;
 //
 // Separar la flecha del recorrido es lo que deja leer la decisión antes de la
 // ejecución; si ocurren juntos, el ojo solo alcanza a seguir el movimiento.
+// FLECHA_FIN queda en el punto medio entre FASE_VOTO y FASE_MOV: así el trazado
+// de la flecha y el recorrido del lobo duran lo mismo y, al cubrir la misma
+// distancia con el mismo suavizado, se ven a idéntica velocidad.
 const VOTO_TRAZO = 0.18;
 const FASE_VOTO = 0.40;
-const FLECHA_FIN = 0.65;
+const FLECHA_FIN = 0.64;
 const FASE_MOV = 0.88;
 
 // Compás extra cuando el alfa cambia de dueño: la simulación se detiene, el
@@ -521,8 +524,9 @@ function dibujar() {
   const votando = fase < FASE_VOTO;
   // El trazo llega al alfa antes de que termine la fase: el resto es la pausa
   const pVoto = clamp(fase / VOTO_TRAZO, 0, 1);
-  // El recorrido arranca en FLECHA_FIN, no al terminar el voto: entre medio
-  // la flecha se queda quieta anunciando el destino
+  // La flecha se traza entre el fin del voto y FLECHA_FIN; el recorrido arranca
+  // recién ahí, así que nunca se dibuja la flecha mientras el lobo se mueve
+  const pFlecha = suavizar(clamp((fase - FASE_VOTO) / (FLECHA_FIN - FASE_VOTO), 0, 1));
   const pMov = suavizar(clamp((fase - FLECHA_FIN) / (FASE_MOV - FLECHA_FIN), 0, 1));
 
   // Compás de relevo del alfa: 0 al abrirse, 1 al cerrarse
@@ -564,14 +568,22 @@ function dibujar() {
 
   // Tiempo 2: una flecha por agente apuntando a DONDE VA, no a de dónde viene.
   // Las tres ecuaciones asignan una coordenada absoluta, no un paso: PWO no
-  // tiene velocidad ni desplazamiento acumulado. Por eso la flecha se dibuja
-  // completa desde el inicio del movimiento, anunciando el destino, y el lobo
-  // recorre después. El color dice qué ecuación lo movió.
+  // tiene velocidad ni desplazamiento acumulado, así que lo significativo es el
+  // destino. La flecha crece desde el origen con el mismo suavizado y una
+  // duración parecida a la del recorrido, de modo que primero se ve trazarse la
+  // decisión y después el lobo la recorre. El color dice qué ecuación lo movió.
   if (ultima && !votando) {
     for (let i = 0; i < vistas.length; i += 1) {
       const [ax, ay] = aPantalla(enDominio(previas[i]), g);
-      const [bx, by] = aPantalla(enDominio(actuales[i]), g);
-      dibujarFlecha(ax, ay, bx, by, colorModo(0.34), radio);
+      const [dx, dy] = aPantalla(enDominio(actuales[i]), g);
+      dibujarFlecha(
+        ax,
+        ay,
+        mezcla(ax, dx, pFlecha),
+        mezcla(ay, dy, pFlecha),
+        colorModo(0.34),
+        radio,
+      );
     }
   }
 
