@@ -19,18 +19,25 @@ const BANDAS = 15;          // niveles del mapa de calor, da aspecto topográfic
 const PASO_MAPA = 3;        // píxeles por muestra al construir el mapa
 // Iteraciones por segundo a 1×. Como los multiplicadores escalan esta base,
 // bajarla alarga todas las velocidades en la misma proporción.
-const VEL_BASE = 0.78;
+const VEL_BASE = 0.72;
 
 // Cada iteración se lee en tres tiempos: la manada evalúa y vota quieta, luego
 // se mueve, y al final se asienta. Ese último compás deja notar el cambio de
 // posición antes de que empiece la iteración siguiente.
-// Reparto de la iteración. La fase de voto tiene dos partes: el trazo de los
-// votantes crece hasta VOTO_TRAZO y después todo queda detenido hasta
-// FASE_VOTO, con los anillos y el valor de R a la vista. Esa pausa es la que
-// deja apreciar la votación, que si no ocurría en un parpadeo.
-const VOTO_TRAZO = 0.20;
-const FASE_VOTO = 0.44;
-const FASE_MOV = 0.86;
+// Reparto de la iteración en cinco tramos, cada uno con una cosa que mirar:
+//
+//   0 .. VOTO_TRAZO    el trazo de los votantes crece hacia el alfa
+//   .. FASE_VOTO       pausa con los anillos y el valor de R a la vista
+//   .. FLECHA_FIN      la flecha aparece SOLA: primero se ve adónde va
+//   .. FASE_MOV        recién ahí el lobo recorre
+//   .. 1               se asienta, quieto, antes de la iteración siguiente
+//
+// Separar la flecha del recorrido es lo que deja leer la decisión antes de la
+// ejecución; si ocurren juntos, el ojo solo alcanza a seguir el movimiento.
+const VOTO_TRAZO = 0.18;
+const FASE_VOTO = 0.40;
+const FLECHA_FIN = 0.65;
+const FASE_MOV = 0.88;
 
 // Compás extra cuando el alfa cambia de dueño: la simulación se detiene, el
 // candidato parpadea y el alfa saliente pierde su luz. Se acorta con la
@@ -514,7 +521,9 @@ function dibujar() {
   const votando = fase < FASE_VOTO;
   // El trazo llega al alfa antes de que termine la fase: el resto es la pausa
   const pVoto = clamp(fase / VOTO_TRAZO, 0, 1);
-  const pMov = suavizar(clamp((fase - FASE_VOTO) / (FASE_MOV - FASE_VOTO), 0, 1));
+  // El recorrido arranca en FLECHA_FIN, no al terminar el voto: entre medio
+  // la flecha se queda quieta anunciando el destino
+  const pMov = suavizar(clamp((fase - FLECHA_FIN) / (FASE_MOV - FLECHA_FIN), 0, 1));
 
   // Compás de relevo del alfa: 0 al abrirse, 1 al cerrarse
   const enCompas = pausaRelevo > 0 && relevoTotal > 0;
