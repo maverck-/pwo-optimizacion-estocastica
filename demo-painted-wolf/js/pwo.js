@@ -11,11 +11,11 @@
  *   ec. 5   L(t) = |c / a(t)|                     influencia del alfa
  *   ec. 6   vota i si  F_i − L·F_alfa ≤ F_alfa
  *   ec. 7   R(t) = c · (número de votos)          fuerza del rally
- *   ec. 8   H(t) = round( a(t)(2r₃ − r₄)/L(t) + r₄ )   umbral estocástico
+ *   ec. 8   H(t) = round( a(t)(2r₃ − r₄)/L(t) + r₅ )   realización del código
  *   ec. 9   R < H → exploración ;  R ≥ H → explotación
  *   ec. 10-11  exploración 1: seguir a un agente aleatorio
  *   ec. 12-13  exploración 2: alfa menos la media poblacional
- *   ec. 14-17  explotación: converger hacia el alfa
+ *   ec. 14-17  explotación: actualizar con referencia en el alfa
  *
  * La decisión del rally es GLOBAL para la iteración: el rally no mueve a los
  * lobos, decide qué ecuación los moverá.
@@ -55,9 +55,12 @@ function media(posiciones, dim) {
  * @param f        función objetivo, recibe el vector de posición
  * @param opciones { T, c, lb, ub, rng, literal }
  *
- * `literal = true` reproduce el código oficial, donde las dos ramas de
- * exploración asignan un valor al vector completo dentro del ciclo de
- * dimensiones (la ecuación 11 es explícitamente escalar a vector).
+ * `literal = true` conserva la estructura y el alcance de las asignaciones del
+ * código oficial: las dos ramas de exploración escriben sobre el vector
+ * completo dentro del ciclo de dimensiones (la ecuación 11 es explícitamente
+ * escalar a vector). Esto no implica equivalencia numérica exacta entre
+ * JavaScript y Python, porque usan generadores aleatorios y reglas de redondeo
+ * diferentes.
  * `literal = false` usa la variante didáctica por componente, que separa
  * mejor el efecto de cada dimensión. La diferencia está documentada en el
  * informe y debe declararse al reproducir resultados.
@@ -98,8 +101,9 @@ export function iterarPWO(est, f, opciones) {
   // ————— Umbral estocástico (ec. 8) —————
   const r3 = rng();
   const r4 = rng();
+  const r5 = rng();
   const E0 = 2 * r3 - r4;
-  const H = L !== 0 ? Math.round((a * E0) / L + rng()) : 0;
+  const H = L !== 0 ? Math.round((a * E0) / L + r5) : 0;
 
   // ————— Decisión global de la iteración (ec. 9) —————
   const modo = R < H ? 'exploracion' : 'explotacion';
@@ -137,7 +141,7 @@ export function iterarPWO(est, f, opciones) {
           }
         }
       } else {
-        // Explotación: converger hacia el alfa (ec. 14, 16, 17)
+        // Explotación: actualizar con referencia en el alfa (ec. 14, 16, 17)
         const D = Math.abs(est.alfaPos[j] - est.posiciones[i][j]);
         const A2 = R + a * A1 * L;
         est.posiciones[i][j] = est.alfaPos[j] - A2 * D;
@@ -147,5 +151,5 @@ export function iterarPWO(est, f, opciones) {
 
   est.t += 1;
 
-  return { a, L, R, H, modo, votantes, previas, r3, r4 };
+  return { a, L, R, H, modo, votantes, previas, r3, r4, r5 };
 }

@@ -3,13 +3,25 @@
 ## 1. La idea en una frase
 
 Painted Wolf Optimization (PWO) mantiene varias soluciones candidatas y, en
-cada iteración, decide si conviene buscar en zonas nuevas o concentrarse
-alrededor de la mejor solución encontrada.
+cada iteración, selecciona entre buscar en otras zonas o actualizar la
+población con referencia en la mejor solución encontrada.
 
 No es un lobo real resolviendo el problema. El lobo es una metáfora para una
 solución matemática.
 
-## 2. Relación entre los lobos y el algoritmo
+## 2. Contexto del algoritmo
+
+El paper se inspira en los licaones africanos. Antes de una caza, la manada
+realiza un rally en el que sus integrantes expresan su disposición a
+participar. El autor convierte esa decisión colectiva en una comparación
+matemática: un rally bajo el umbral mantiene la exploración y uno que alcanza
+el umbral activa la explotación.
+
+El contexto ayuda a recordar las fases, pero no explica por sí solo el
+algoritmo. La operación relevante es cómo cada ecuación transforma los valores
+de una solución.
+
+## 3. Relación entre los lobos y el algoritmo
 
 | Metáfora | Significado matemático |
 |---|---|
@@ -18,7 +30,7 @@ solución matemática.
 | Terreno | Función objetivo |
 | Calidad de una posición | Fitness de la solución |
 | Manada | Población de soluciones |
-| Lobo alfa | Mejor solución conocida |
+| Lobo alfa | Agente que obtuvo el mejor registro histórico |
 | Rally | Decisión entre exploración y explotación |
 | Movimiento | Nueva asignación de valores |
 
@@ -29,9 +41,11 @@ $$
 $$
 
 La función objetivo evalúa esa posición. En un problema de minimización, el
-lobo con el menor valor observado se convierte en alfa.
+menor valor observado se conserva como registro alfa. El código guarda por
+separado el vector histórico `Alpha_pos` y el índice del agente que lo obtuvo;
+si ese agente explora después, ambas posiciones pueden dejar de coincidir.
 
-## 3. Analogía de las pelotas
+## 4. Analogía de las pelotas
 
 La analogía usada para recocido simulado también sirve, con una diferencia:
 ahora no hay una sola pelota, sino varias.
@@ -54,7 +68,7 @@ En PWO, primero se decide qué regla de movimiento utilizará la población.
 | Referencia | Estado actual y mejor histórico | Alfa y población |
 | Control dinámico | Temperatura | Rally y parámetros de movimiento |
 
-## 4. ¿Qué hacen $R$ y $H$?
+## 5. ¿Qué hacen $R$ y $H$?
 
 $R$ es la fuerza del rally y $H$ es un umbral estocástico. Su comparación
 selecciona el modo global de la iteración:
@@ -84,10 +98,12 @@ distancia final también depende de:
 - los números aleatorios de la ecuación seleccionada.
 
 Durante la exploración, los agentes pueden seguir referencias alternativas y
-visitar regiones alejadas. Durante la explotación, cada variable se actualiza
-con respecto al valor correspondiente del alfa.
+visitar otras regiones. Durante la explotación, cada variable se actualiza con
+el valor correspondiente del alfa como referencia. El paper describe esta rama
+como convergencia, pero la ecuación no garantiza que cada movimiento individual
+reduzca la distancia.
 
-## 5. Ejemplo sencillo
+## 6. Ejemplo sencillo
 
 Supongamos que se minimiza:
 
@@ -116,7 +132,7 @@ explotación, los demás agentes actualizan sus variables usando la posición de
 alfa como referencia. Esto no significa que todos se copien exactamente: la
 distancia al alfa se combina con parámetros dinámicos y valores aleatorios.
 
-## 6. ¿PWO solo puede minimizar?
+## 7. ¿PWO solo puede minimizar?
 
 No. El paper y el repositorio oficial están escritos con la convención de
 minimización:
@@ -150,18 +166,19 @@ puede modificar la dinámica del rally. Una versión para maximización debe
 documentar la transformación y comprobar la sensibilidad al signo y a la
 escala de la función objetivo.
 
-## 7. Demo web
+## 8. Demo web
 
-La demo interactiva del proyecto permite:
+La demo interactiva muestra:
 
-- alternar entre la metáfora de lobos y la de pelotas;
-- observar la posición del alfa y las trayectorias;
-- ejecutar la búsqueda paso a paso;
-- ver los valores de $R$ y $H$;
-- distinguir exploración y explotación;
-- cambiar entre minimización y maximización;
-- probar un valle suave, una colina y un terreno con óptimos locales.
+- la manada sobre un mapa de calor;
+- el mejor vector histórico $\mathbf{X}_{\alpha}$ y el agente que lo obtuvo;
+- la formación del rally y los valores de $R$ y $H$;
+- la selección entre exploración y explotación;
+- el desplazamiento de cada agente en una iteración;
+- terrenos con tres niveles de dificultad;
+- la comparación entre la actualización literal del código y una variante por
+  componente.
 
-La demo es didáctica. Para resultados experimentales se debe utilizar una
-implementación reproducible y declarar las decisiones tomadas frente a las
-diferencias entre paper, pseudocódigo y código oficial.
+La demo sirve para seguir la mecánica del algoritmo. No constituye evidencia de
+desempeño ni reemplaza experimentos con semillas, parámetros y resultados
+registrados.

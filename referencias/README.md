@@ -1,7 +1,7 @@
 # Referencias
 
-Esta carpeta contiene copias de trabajo. Los originales académicos permanecen
-en la carpeta `Proyecto Curso` de MII902.
+Esta carpeta contiene las copias usadas por el repositorio. Los documentos de
+la carpeta `Proyecto Curso` de MII902 permanecen sin modificaciones.
 
 ## Paper
 
@@ -29,4 +29,3 @@ El repositorio oficial se mantiene como repositorio hermano:
 
 URL de origen:
 <https://github.com/saeidsheikhi/Painted-Wolf-Optimization>
-

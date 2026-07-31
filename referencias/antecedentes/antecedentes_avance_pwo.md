@@ -108,7 +108,7 @@ $$
 
 1. Inicializar $N$ soluciones aleatorias dentro del dominio.
 2. Evaluar la función objetivo de cada solución.
-3. Identificar la mejor solución actual, llamada alfa.
+3. Identificar la mejor solución registrada, llamada alfa.
 4. Calcular la influencia dinámica del alfa.
 5. Calcular la fuerza de la votación de la manada.
 6. Calcular un umbral aleatorio de rally.
@@ -334,7 +334,11 @@ Correspondencias principales en `Python/PWO.py`:
 | Estrategia exploratoria 2 | bloque `else` de exploración |
 | Explotación | bloque `rally_strength >= rally_threshold` |
 
-Una ejecución interna con semilla fija, función Sphere de 3 dimensiones, 20 agentes y 100 iteraciones redujo el fitness desde 4281.3964 hasta $2.52\times10^{-92}$. Esto confirma que el código Python se ejecuta y converge en ese caso simple; no constituye por sí solo una validación experimental del desempeño reportado por el paper.
+Una ejecución interna con semilla fija, función Sphere de 3 dimensiones, 20
+agentes y 100 iteraciones redujo el fitness desde 4281.3964 hasta
+$2.52\times10^{-92}$. Esto confirma que el código Python se ejecuta y reduce
+el fitness en ese caso simple; no constituye por sí solo una validación
+experimental del desempeño reportado por el paper.
 
 ## 9. Puntos técnicos que deben verificarse antes de presentar resultados
 
@@ -420,19 +424,23 @@ La versión más clara para el primer ruteo es la explotación, porque actualiza
 
 ## 12. Estructura propuesta de la presentación
 
-1. Portada y objetivo del avance.
-2. Qué optimiza PWO y cómo representa una solución.
-3. Ciclo general: inicializar, evaluar, decidir y mover.
-4. Rally: influencia, votos y umbral.
-5. Exploración 1.
-6. Exploración 2.
-7. Explotación.
-8. Ruteo de una iteración.
-9. Correspondencia ecuaciones-código.
-10. Validación preliminar y puntos pendientes.
-11. Camino al informe final: binarización y problema discreto.
+1. Portada.
+2. Contexto breve de PWO.
+3. Representación de agentes y variables.
+4. Ciclo general: inicializar, evaluar, decidir y mover.
+5. Inicialización.
+6. Rally: influencia, votos y umbral.
+7. Exploración 1.
+8. Exploración 2.
+9. Explotación.
+10. Ruteo: selección de la rama.
+11. Ruteo: asignación y evaluación.
+12. Comprobación y diferencias paper-código, como lámina opcional.
+13. Cierre y camino a la binarización.
 
-La metáfora de los lobos debe limitarse a introducir los nombres. El mayor tiempo debe destinarse a las variables, ecuaciones, decisiones y sustitución numérica.
+El contexto biológico debe ser breve y traducirse de inmediato a operaciones
+de optimización. El mayor tiempo se destina a las variables, ecuaciones,
+decisiones y sustitución numérica.
 
 ## 13. Lista de trabajo priorizada
 

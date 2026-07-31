@@ -1,390 +1,540 @@
-# Presentación de avance - contenido fuente
+# Guía de contenido para la presentación de avance
 
-Duración objetivo: 12 a 15 minutos  
-Audiencia: profesor y estudiantes de MII902  
-Objetivo: demostrar cómo PWO asigna valores reales a las variables de decisión.
+Esta guía organiza el contenido por láminas. No define el diseño visual de la
+presentación.
 
-## Diapositiva 1 - Portada
+Duración sugerida por el equipo: 12 a 15 minutos. En el corpus del curso no se
+encontró una duración obligatoria para esta presentación de avance.
 
-### Título visible
+## Orientación confirmada
+
+El profesor pidió explicar cómo el algoritmo asigna valores a las variables de
+decisión mediante sus ecuaciones de movimiento en el dominio de los reales. La
+binarización corresponde al informe final. Un ruteo es bienvenido cuando
+facilita la explicación.
+
+Las clases agregan cuatro criterios:
+
+1. usar un contexto breve del algoritmo;
+2. definir la nomenclatura y los parámetros;
+3. mostrar la secuencia de iteraciones, agentes y dimensiones;
+4. explicar el delta o perturbación que produce cada nuevo valor.
+
+La presentación debe responder:
+
+> Dado \(X_{i,j}(t)\), ¿cómo calcula PWO el nuevo valor
+> \(X_{i,j}(t+1)\)?
+
+## Lámina 1. Portada
+
+**Título sugerido**
 
 **Painted Wolf Optimization**
 
-Cómo las ecuaciones de movimiento asignan valores reales
+Asignación de valores reales mediante ecuaciones de movimiento
 
-Maverick Gayoso · Rogelio González  
-MII902 Optimización Estocástica · 2026
+**Contenido**
 
-### Trabajo narrativo
+- Maverick Gayoso y Rogelio González.
+- MII902 Optimización Estocástica.
+- Paper principal de Saeid Sheikhi (2026).
 
-Abrir con la pregunta que organiza toda la exposición: qué valor recibe una
-variable en la siguiente iteración.
+**Qué explicar**
 
-### Fuente
+En una frase, indicar que la exposición seguirá el cálculo que transforma una
+población actual en una nueva población real.
 
-Sheikhi (2026), DOI 10.32604/cmc.2026.077788.
+**Tiempo sugerido:** 20 segundos.
 
----
+## Lámina 2. Contexto breve de PWO
 
-## Diapositiva 2 - La metáfora termina donde comienza la variable
+**Título sugerido**
 
-### Título visible
+**Del rally de la manada a una decisión de búsqueda**
 
-**Cada lobo es una solución; cada dimensión, una variable**
+**Contenido**
 
-### Contenido visible
+El autor se inspira en los licaones africanos o *painted wolves*. Antes de una
+caza, la manada realiza un rally en el que sus integrantes expresan su
+disposición a participar. PWO traduce esta conducta a una decisión entre
+continuar buscando y actualizar la población con referencia en el alfa.
+
+| Metáfora del paper | Operación en PWO |
+|---|---|
+| Manada | Población de soluciones |
+| Rally y votos | Selección del modo de búsqueda |
+| Búsqueda de presa | Exploración |
+| Caza | Explotación |
+| Alfa | Mejor solución registrada |
+
+**Mensaje central**
+
+El contexto permite entender los nombres de las fases. La explicación técnica
+comienza al representar cada lobo como una solución.
+
+**Tiempo sugerido:** 50 segundos.
+
+## Lámina 3. Representación de una solución
+
+**Título sugerido**
+
+**Cada agente es un vector; cada componente, una variable**
 
 $$
 \mathbf{X}_i(t)=
 [X_{i,1}(t),X_{i,2}(t),\ldots,X_{i,d}(t)]
 $$
 
-- $i$: solución o agente.
-- $j$: variable de decisión.
-- $t$: iteración.
-- $f(\mathbf{X}_i)$: calidad de la asignación.
-
-### Mensaje central
-
-PWO no mueve animales: transforma vectores reales y compara su fitness.
-
-### Fuente
-
-Sheikhi (2026), secciones 2.1 a 2.5.
-
----
-
-## Diapositiva 3 - La primera asignación respeta el dominio
-
-### Título visible
-
-**La población parte con valores reales dentro de cada intervalo**
-
-### Contenido visible
-
 $$
-X_{i,j}(0)=
-lb_j+u_{i,j}(ub_j-lb_j),
-\qquad u_{i,j}\sim U(0,1)
+F_i(t)=f(\mathbf{X}_i(t))
 $$
 
-Flujo:
+**Nomenclatura**
 
-1. generar $N$ soluciones;
-2. evaluar $f(\mathbf{X}_i)$;
-3. conservar la mejor como $\mathbf{X}_{\alpha}$;
-4. reparar por saturación si una variable sale del dominio.
+- \(i\): agente o solución.
+- \(j\): dimensión o variable de decisión.
+- \(t\): iteración.
+- \(d\): número de variables.
+- \(F_i(t)\): fitness de la solución.
+- \(\mathbf{X}_{\alpha}(t)\): mejor solución registrada.
 
-### Mensaje central
+**Mensaje central**
 
-La inicialización ya es una asignación completa de valores a todas las
-variables.
+Mover un agente significa volver a asignar valores a las componentes de su
+vector. La función objetivo permite comparar una asignación con otra.
 
-### Fuente
+**Tiempo sugerido:** 55 segundos.
 
-Código oficial `Python/PWO.py` y `Matlab/PWO.m`.
+## Lámina 4. Ciclo del algoritmo
 
----
+**Título sugerido**
 
-## Diapositiva 4 - El rally elige la regla de movimiento
+**PWO repite una secuencia de evaluación, decisión y movimiento**
 
-### Título visible
+```text
+Inicializar población real
+        ↓
+Reparar y evaluar soluciones
+        ↓
+Actualizar el alfa
+        ↓
+Calcular a(t), L(t), R(t) y H(t)
+        ↓
+Elegir exploración o explotación
+        ↓
+Aplicar una ecuación de movimiento
+        ↓
+Obtener X_i(t+1)
+        ↓
+Reparar y evaluar en la iteración siguiente
+```
 
-**Antes de mover, la población decide explorar o explotar**
+**Mensaje central**
 
-### Contenido visible
+El rally elige la rama. Una de las ecuaciones de exploración o explotación
+produce la nueva asignación.
 
-1. $a(t)=2(1-t/T)$
-2. $L(t)=|0.04/a(t)|$
-3. cada agente cercano al alfa aporta 0.04
-4. se compara fuerza $R(t)$ con umbral $H(t)$
+**Tiempo sugerido:** 60 segundos.
+
+## Lámina 5. Inicialización
+
+**Título sugerido**
+
+**La primera asignación respeta el dominio de cada variable**
 
 $$
-R(t)<H(t)
-\Rightarrow
-\text{exploración}
+X_{i,j}(0)
+=
+lb_j
++
+u_{i,j}(ub_j-lb_j),
+\qquad
+u_{i,j}\sim U(0,1)
+$$
+
+Después de inicializar:
+
+1. se evalúa \(F_i(0)=f(\mathbf{X}_i(0))\);
+2. se identifica el mejor registro;
+3. se conserva su posición como \(\mathbf{X}_{\alpha}\).
+
+**Mensaje central**
+
+La inicialización es la primera asignación completa de valores reales. Las
+implementaciones concretan así la inicialización aleatoria indicada por el
+paper.
+
+**Tiempo sugerido:** 60 segundos.
+
+## Lámina 6. Rally
+
+**Título sugerido**
+
+**El rally decide qué ecuación se aplicará**
+
+$$
+a(t)=2\left(1-\frac{t}{T}\right),
+\qquad
+L(t)=\left|\frac{0.04}{a(t)}\right|
+$$
+
+Un agente no alfa vota si:
+
+$$
+F_i(t)-L(t)F_{\alpha}(t)
+\leq
+F_{\alpha}(t)
+$$
+
+La fuerza acumulada es:
+
+$$
+R(t)=0.04
+\sum_{i\ne\alpha}
+\mathbb{I}
+\left[
+F_i(t)-L(t)F_{\alpha}(t)
+\leq
+F_{\alpha}(t)
+\right]
+$$
+
+El umbral publicado es:
+
+$$
+H(t)=
+\operatorname{round}
+\left(
+\frac{a(t)(2r_3-r_4)}{L(t)}
++r_4
+\right)
+$$
+
+La decisión global es:
+
+$$
+\begin{cases}
+R(t)<H(t), & \text{exploración},\\
+R(t)\geq H(t), & \text{explotación}.
+\end{cases}
+$$
+
+**Mensaje central**
+
+\(R(t)\) y \(H(t)\) no asignan todavía un valor. Seleccionan la ecuación que lo
+hará.
+
+**Tiempo sugerido:** 80 segundos.
+
+## Lámina 7. Exploración 1
+
+**Título sugerido**
+
+**Una dimensión de un agente aleatorio genera la asignación**
+
+$$
+D_{i,j}^{rand}(t)=
+\left|
+\left(2L(t)r_1+r_2\right)X_{rand,j}(t)
+-X_{i,j}(t)
+\right|
 $$
 
 $$
-R(t)\geq H(t)
-\Rightarrow
+\mathbf{X}_i(t+1)=
+X_{rand,j}(t)
+-
+\left(2a(t)r_1-a(t)\right)
+D_{i,j}^{rand}(t)
+$$
+
+**Secuencia**
+
+1. seleccionar un agente aleatorio;
+2. tomar su componente \(j\);
+3. calcular la distancia perturbada;
+4. obtener un escalar;
+5. asignar ese resultado al vector del agente.
+
+**Precisión**
+
+El paper define una actualización escalar-a-vector. El código ejecuta esta
+escritura dentro del ciclo de dimensiones.
+
+**Tiempo sugerido:** 75 segundos.
+
+## Lámina 8. Exploración 2
+
+**Título sugerido**
+
+**La segunda exploración combina alfa, media y posición individual**
+
+$$
+\overline{\mathbf{X}}(t)
+=
+\frac{1}{N}
+\sum_{i=1}^{N}
+\mathbf{X}_i(t)
+$$
+
+$$
+\mathbf{X}_i(t+1)=
+\left(
+\mathbf{X}_{\alpha}(t)
+-
+\overline{\mathbf{X}}(t)
+\right)
+-
+R(t)
+\left|
+\mathbf{X}_{\alpha}(t)-\mathbf{X}_i(t)
+\right|
+$$
+
+**Secuencia**
+
+1. calcular la media de la población;
+2. restar la media al alfa;
+3. calcular la distancia entre el alfa y el agente;
+4. ponderarla con \(R(t)\);
+5. obtener el nuevo vector.
+
+**Mensaje central**
+
+La ecuación actualiza simultáneamente todas las componentes. La lectura del
+primer término como información global es una interpretación geométrica del
+equipo.
+
+**Tiempo sugerido:** 65 segundos.
+
+## Lámina 9. Explotación
+
+**Título sugerido**
+
+**La explotación asigna cada variable con referencia en el alfa**
+
+$$
+D_{i,j}^{\alpha}(t)
+=
+\left|
+X_{\alpha,j}(t)-X_{i,j}(t)
+\right|
+$$
+
+$$
+A_1(t)=2a(t)r_1-a(t)
+$$
+
+$$
+A_2(t)=R(t)+a(t)A_1(t)L(t)
+$$
+
+$$
+X_{i,j}(t+1)
+=
+X_{\alpha,j}(t)
+-
+A_2(t)D_{i,j}^{\alpha}(t)
+$$
+
+**Secuencia**
+
+1. tomar el valor del alfa en la dimensión \(j\);
+2. calcular la distancia respecto del agente;
+3. ponderar la distancia mediante \(A_2(t)\);
+4. restar la perturbación al valor del alfa.
+
+**Mensaje central**
+
+Esta ecuación responde directamente qué valor recibe \(X_{i,j}(t+1)\). La
+referencia en el alfa no garantiza que cada movimiento individual reduzca la
+distancia.
+
+**Tiempo sugerido:** 80 segundos.
+
+## Lámina 10. Ruteo: selección de la rama
+
+**Título sugerido**
+
+**El rally selecciona explotación en una población de tres agentes**
+
+Se usa:
+
+$$
+f(\mathbf{x})=x_1^2+x_2^2,
+\qquad
+\mathbf{x}\in[-10,10]^2
+$$
+
+| Agente | Posición | Fitness |
+|---|---:|---:|
+| 1 | \((1.01,1.00)\) | \(2.0201\) |
+| 2 | \((0.99,1.01)\) | \(2.0002\) |
+| 3 | \((1.00,0.99)\) | \(1.9801\) |
+
+El agente 3 es el alfa. Con \(T=10\), \(t=1\) y \(c=0.04\):
+
+$$
+a=1.8,
+\qquad
+L=0.022222
+$$
+
+Los agentes 1 y 2 votan:
+
+$$
+R=2(0.04)=0.08
+$$
+
+Fijando \(r_3=0.2\) y \(r_4=0.4\):
+
+$$
+H=\operatorname{round}(0.4)=0
+$$
+
+Por tanto:
+
+$$
+R=0.08\geq H=0
+\quad\Rightarrow\quad
 \text{explotación}
 $$
 
-### Mensaje central
+**Tiempo sugerido:** 80 segundos.
 
-El rally no cambia variables directamente; selecciona la ecuación que las
-cambiará.
+## Lámina 11. Ruteo: asignación y evaluación
 
-### Fuente
+**Título sugerido**
 
-Sheikhi (2026), ecuaciones 1 a 3.
+**La ecuación produce dos nuevos valores reales**
 
----
-
-## Diapositiva 5 - PWO dispone de tres asignaciones
-
-### Título visible
-
-**Una decisión global activa una de tres reglas**
-
-### Contenido visible
-
-**Exploración 1**  
-Seguir una dimensión de un agente aleatorio.
-
-**Exploración 2**  
-Combinar alfa, media poblacional y distancia individual.
-
-**Explotación**  
-Actualizar cada dimensión con respecto al alfa.
-
-### Mensaje central
-
-Las tres ramas reciben la misma población, pero construyen
-$\mathbf{X}_i(t+1)$ con información distinta.
-
-### Fuente
-
-Sheikhi (2026), ecuaciones 4 a 9.
-
----
-
-## Diapositiva 6 - Exploración 1
-
-### Título visible
-
-**Una dimensión aleatoria puede redefinir el vector completo**
-
-### Contenido visible
+Para actualizar el agente 1 se fija \(r_1=0.7\):
 
 $$
-D_{i,j}^{rand}=
-|(2Lr_1+r_2)X_{rand,j}-X_{i,j}|
+A_1=0.72,
+\qquad
+A_2=0.1088
+$$
+
+Primera variable:
+
+$$
+X_{1,1}(t+1)
+=
+1.00-(0.1088)(0.01)
+=
+0.998912
+$$
+
+Segunda variable:
+
+$$
+X_{1,2}(t+1)
+=
+0.99-(0.1088)(0.01)
+=
+0.988912
+$$
+
+Nueva solución y evaluación:
+
+$$
+\mathbf{X}_1(t+1)
+=
+(0.998912,0.988912)
 $$
 
 $$
-\mathbf{X}_i(t+1)=
-X_{rand,j}-(2ar_1-a)D_{i,j}^{rand}
+f(\mathbf{X}_1):
+2.0201
+\longrightarrow
+1.975772
 $$
 
-- se elige otro agente al azar;
-- se calcula una distancia en la dimensión $j$;
-- el escalar resultante se asigna al vector completo.
+**Cierre del ruteo**
 
-### Mensaje central
+- Ninguna variable requiere reparación.
+- La nueva solución supera al alfa anterior.
+- En la evaluación siguiente, el agente 1 se convierte en el nuevo alfa.
 
-Es una actualización escalar-a-vector y la rama más particular de PWO.
+**Mensaje central**
 
-### Fuente
+El ejemplo muestra la decisión de la rama, la asignación variable por variable
+y la evaluación de la nueva solución.
 
-Sheikhi (2026), ecuaciones 4 y 5.
+**Tiempo sugerido:** 105 segundos.
 
----
+## Lámina 12. Comprobación y decisiones pendientes
 
-## Diapositiva 7 - Exploración 2
+Esta lámina es opcional. También puede quedar como respaldo para preguntas.
 
-### Título visible
+**Título sugerido**
 
-**La segunda exploración combina dirección global y distancia local**
+**La implementación funciona, pero no coincide por completo con el paper**
 
-### Contenido visible
+**Comprobación**
 
-$$
-\mathbf{X}_i(t+1)=
-(\mathbf{X}_{\alpha}-\overline{\mathbf{X}})
--
-R|\mathbf{X}_{\alpha}-\mathbf{X}_i|
-$$
+La implementación Python oficial redujo el fitness en Sphere con una semilla
+fija. Es una prueba de funcionamiento, no una demostración de superioridad.
 
-**Dirección global**  
-$\mathbf{X}_{\alpha}-\overline{\mathbf{X}}$
+**Diferencias relevantes**
 
-**Ajuste individual**  
-$R|\mathbf{X}_{\alpha}-\mathbf{X}_i|$
+1. El código usa un aleatorio adicional en el umbral.
+2. Una tabla registra `Linf = 0.05`, mientras el método y el código usan
+   \(0.04\).
+3. Python evita \(a(t)=0\); MATLAB puede dividir por cero en la última
+   iteración.
+4. Algunas selecciones y escrituras vectoriales se repiten dentro del ciclo de
+   dimensiones.
 
-### Mensaje central
+**Tiempo sugerido:** 45 segundos.
 
-La población se coordina alrededor del alfa sin perder la posición particular
-de cada agente.
+## Lámina 13. Cierre
 
-### Fuente
+**Título sugerido**
 
-Sheikhi (2026), ecuación 6.
+**Primero se fija la dinámica real; después se binariza**
 
----
+**Conclusiones**
 
-## Diapositiva 8 - Explotación
+- Cada agente representa una asignación real completa.
+- El rally selecciona una regla de movimiento.
+- Dos ecuaciones de exploración y una de explotación generan
+  \(\mathbf{X}_i(t+1)\).
+- El ruteo muestra cómo se asignan y evalúan los nuevos valores.
 
-### Título visible
-
-**La explotación asigna cada variable respecto del alfa**
-
-### Contenido visible
-
-$$
-D_{i,j}^{\alpha}=
-|X_{\alpha,j}-X_{i,j}|
-$$
-
-$$
-A_2=R+a(2ar_1-a)L
-$$
-
-$$
-X_{i,j}(t+1)=
-X_{\alpha,j}-A_2D_{i,j}^{\alpha}
-$$
-
-### Mensaje central
-
-Esta ecuación responde directamente qué valor recibe la variable $j$ en la
-siguiente iteración.
-
-### Fuente
-
-Sheikhi (2026), ecuaciones 7 a 9.
-
----
-
-## Diapositiva 9 - Ruteo de una iteración
-
-### Título visible
-
-**Un movimiento de explotación mejora el fitness de 2.0201 a 1.9758**
-
-### Contenido visible
-
-Agente:
-
-$$
-\mathbf{X}_1(t)=(1.01,1.00)
-$$
-
-Alfa:
-
-$$
-\mathbf{X}_{\alpha}(t)=(1.00,0.99)
-$$
-
-Parámetros fijados:
-
-$$
-a=1.8,\quad L=0.022222,\quad R=0.08,\quad A_2=0.1088
-$$
-
-Resultado:
-
-$$
-\mathbf{X}_1(t+1)=(0.998912,0.988912)
-$$
-
-$$
-f:\;2.0201\rightarrow1.975772
-$$
-
-### Mensaje central
-
-La mejora surge de dos asignaciones escalares verificables, una por variable.
-
-### Fuente
-
-Cálculo propio reproducible a partir de las ecuaciones 7 a 9.
-
----
-
-## Diapositiva 10 - Validación preliminar
-
-### Título visible
-
-**El código converge en Sphere; aún no reproduce el estudio completo**
-
-### Contenido visible
-
-Configuración:
-
-- 20 agentes;
-- 3 dimensiones;
-- 100 iteraciones;
-- dominio $[-100,100]^3$;
-- semilla 20260728.
-
-Resultado:
-
-$$
-4281.3964
-\;\longrightarrow\;
-2.5198\times10^{-92}
-$$
-
-### Mensaje central
-
-La ejecución demuestra funcionamiento en un caso simple, no superioridad frente
-a otros algoritmos.
-
-### Fuente
-
-Ejecución local de la implementación Python oficial.
-
----
-
-## Diapositiva 11 - Reproducibilidad
-
-### Título visible
-
-**Paper, pseudocódigo y código no coinciden en todos los detalles**
-
-### Contenido visible
-
-1. el código usa un aleatorio adicional en el umbral;
-2. Python no lleva $a(t)$ exactamente a cero;
-3. MATLAB puede dividir por cero en la última iteración;
-4. la última población generada no se evalúa;
-5. las ramas vectoriales se ejecutan dentro del ciclo de dimensiones.
-
-Decisión de avance:
-
-**paper como formulación; Python como referencia operacional.**
-
-### Mensaje central
-
-Las diferencias se documentan antes de modificar o binarizar el algoritmo.
-
-### Fuente
-
-Contraste propio entre paper, `Python/PWO.py` y `Matlab/PWO.m`.
-
----
-
-## Diapositiva 12 - Cierre
-
-### Título visible
-
-**El avance deja una especificación continua lista para implementar**
-
-### Contenido visible
-
-Hoy:
-
-- variables y notación definidas;
-- tres movimientos explicados;
-- ruteo verificable;
-- código oficial ejecutado;
-- diferencias registradas.
-
-Siguiente:
+**Siguiente etapa**
 
 1. estabilizar la implementación continua;
-2. reproducir funciones benchmark;
-3. definir binarización;
-4. resolver un problema discreto.
+2. reproducir funciones de referencia;
+3. definir la binarización;
+4. aplicar PWO a un problema discreto.
 
-### Mensaje central
+**Tiempo sugerido:** 35 segundos.
 
-Primero se fija cómo PWO asigna valores reales; después se transforma esa
-dinámica al dominio binario.
+## Distribución sugerida
 
-### Fuente
+| Expositor | Láminas |
+|---|---|
+| Maverick Gayoso | 1 a 6 |
+| Rogelio González | 7 a 11 |
+| Maverick Gayoso | 12 y 13 |
 
-Síntesis del avance y plan de trabajo del proyecto.
+La lámina 12 puede omitirse si el tiempo es limitado. En ese caso, sus puntos
+principales pueden incorporarse al cierre o reservarse para preguntas.
 
+## Contenido que conviene dejar fuera del cuerpo principal
+
+- La historia biológica detallada del licaón.
+- La comparación completa con otras metaheurísticas.
+- Los resultados completos de los benchmarks del paper.
+- El desarrollo de la binarización.
+- La explicación exhaustiva de las discrepancias del código.
+
+## Fuentes internas
+
+- Paper local de PWO.
+- Implementaciones oficiales en Python y MATLAB.
+- `referencias/antecedentes/antecedentes_avance_pwo.md`.
+- `docs/informe/informe-avance.md`.
+- Transcripciones locales de las clases del 4, 10 y 18 de julio.

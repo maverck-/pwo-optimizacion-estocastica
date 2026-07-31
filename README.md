@@ -17,8 +17,10 @@ se desarrollarán para la entrega final.
 
 - Informe en formato paper.
 - Presentación.
-- Guion de exposición.
 - Plazo: viernes 31 de julio de 2026, 19:00.
+
+La guía de contenido y el guion son documentos de apoyo para preparar la
+presentación; no constituyen entregables adicionales indicados por el profesor.
 
 ## Estructura
 
@@ -27,8 +29,8 @@ se desarrollarán para la entrega final.
 ├── demo-painted-wolf/    # Demo visual e interactiva de PWO
 ├── docs/
 │   ├── informe/          # Fuente Markdown del paper
-│   └── presentacion/     # Contenido y guion
-├── entregables/avance/   # Archivos listos para enviar
+│   └── presentacion/     # Guía por láminas y guion
+├── entregables/avance/   # Copias y borradores de entrega
 ├── experimentos/        # Ejecuciones y resultados reproducibles
 ├── figuras/              # Recursos visuales propios o derivados
 ├── referencias/
@@ -46,31 +48,30 @@ El código publicado por los autores está disponible en el repositorio hermano:
 ../Painted-Wolf-Optimization
 ```
 
-Este repositorio reúne la reproducción en Python y MATLAB, las pruebas, la demo
-interactiva y los entregables del curso.
+Este repositorio reúne los experimentos de reproducción, la demo interactiva,
+la documentación técnica y los entregables del curso.
 
 ## Documentos principales
 
 - `docs/informe/informe-avance.md`
 - `docs/presentacion/presentacion-avance.md`
 - `docs/presentacion/guion-presentacion.md`
-- `docs/presentacion/build-presentation.mjs`
 - `docs/explicacion-intuitiva-pwo.md`
+- `docs/auditoria-integridad-corpus.md`
 - `docs/plan-entrega-avance.md`
 
-La presentación editable y las copias listas para revisión se encuentran en
-`entregables/avance/`.
+La guía organiza el contenido por láminas. El guion desarrolla la explicación
+oral y el informe conserva el análisis con estructura académica. Las copias de
+trabajo para la entrega se encuentran en `entregables/avance/`.
 
 ## Demo web interactiva
 
-`demo-painted-wolf/` contiene una demo independiente que muestra la manada
-sobre un mapa de calor visto desde arriba: el alfa histórico, la votación del
-rally, la comparación entre `R` y `H`, y la elección entre exploración y
-explotación. Comparte el sistema visual de la demo de recocido simulado de la
-Actividad 1, de modo que ambas se pueden presentar seguidas.
+`demo-painted-wolf/` muestra la manada sobre un mapa de calor, el alfa
+histórico, la votación del rally, la comparación entre `R` y `H`, y la elección
+entre exploración y explotación.
 
-No usa dependencias ni build. Al usar módulos ES necesita un servidor, no basta
-abrir el archivo:
+No requiere instalación ni proceso de build. Como usa módulos ES, debe
+ejecutarse desde un servidor local:
 
 ```bash
 cd demo-painted-wolf

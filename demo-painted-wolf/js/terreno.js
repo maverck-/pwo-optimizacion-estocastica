@@ -9,15 +9,16 @@
  *   f(x, y) = 0.055 (x² + y²) − Σ dₖ exp( −‖(x,y) − cₖ‖² / 2σₖ² )
  *
  * La cuenca hace que los bordes sean malos y las gaussianas producen las
- * manchas orgánicas del mapa. La generación se valida por rechazo para
- * garantizar tres cosas:
+ * manchas orgánicas del mapa. La generación se valida por rechazo sobre una
+ * grilla para buscar tres propiedades:
  *
- *   1. hay UN solo mínimo global, con margen claro sobre el segundo mejor;
+ *   1. hay un mínimo muestreado con margen sobre el segundo mejor;
  *   2. hay varios mínimos locales cercanos en valor, que sirven de trampa;
  *   3. el óptimo global cae en la banda central, lejos de las tarjetas.
  *
- * Al final el terreno se desplaza para que el mínimo global valga exactamente
- * 0, que es la convención de las funciones de prueba del paper.
+ * Al final el terreno se desplaza para que el mínimo refinado usado por la
+ * demo valga 0. Esta normalización facilita la lectura visual y no reproduce
+ * la escala de todas las funciones de prueba del paper.
  */
 
 export const DOMINIO = { lb: -5, ub: 5 };
@@ -225,7 +226,7 @@ function intentar(cfg, rng) {
   const segundo = minimos[1].v;
   const rango = max - global.v;
 
-  // Un único global, con ventaja clara sobre el segundo mejor
+  // Mínimo muestreado con ventaja sobre el segundo mejor de la grilla
   if (segundo - global.v < cfg.margen * rango) return null;
   // Y ubicado en la banda visible, lejos de las tarjetas flotantes
   if (Math.hypot(global.x, global.y) > RADIO_CENTRAL + 0.4) return null;
@@ -235,9 +236,10 @@ function intentar(cfg, rng) {
 }
 
 /**
- * Terreno nuevo del nivel pedido, garantizando un único mínimo global con
- * margen sobre el segundo mejor, mínimos locales que sirvan de trampa, y el
- * óptimo dentro de la banda visible.
+ * Terreno nuevo del nivel pedido. La selección por grilla busca un mínimo
+ * muestreado con margen sobre el segundo mejor, mínimos locales que sirvan de
+ * trampa y un óptimo de referencia dentro de la banda visible. Este
+ * procedimiento no demuestra unicidad global en el dominio continuo.
  */
 export function crearTerreno(dificultad = 1, rng = Math.random) {
   const cfg = DIFICULTADES[clampIndice(dificultad)];

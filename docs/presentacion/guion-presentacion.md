@@ -1,246 +1,303 @@
-# Guion de presentación - avance PWO
+# Guion de presentación de avance: Painted Wolf Optimization
 
-Duración objetivo: 12 a 15 minutos.  
+Duración estimada: 12 a 15 minutos.
+
 Distribución sugerida:
 
-- Maverick Gayoso: diapositivas 1 a 5.
-- Rogelio González: diapositivas 6 a 9.
-- Maverick Gayoso: diapositivas 10 a 12.
+- Maverick Gayoso: láminas 1 a 6.
+- Rogelio González: láminas 7 a 11.
+- Maverick Gayoso: láminas 12 y 13.
 
-## Diapositiva 1 - Maverick - 40 segundos
+La lámina 12 es opcional y puede reservarse para preguntas.
 
-“Buenas tardes. Nuestro proyecto estudia Painted Wolf Optimization, o PWO, una
-metaheurística poblacional publicada en 2026. Para este avance nos
-concentraremos en la pregunta que definió el profesor: cómo el algoritmo asigna
-valores a las variables de decisión en el dominio de los reales. Dejaremos la
-binarización para la entrega final.
+## Lámina 1. Portada
 
-La idea de esta presentación es ir desde la representación de una solución
-hasta un cálculo numérico completo de una actualización.”
+**Tiempo sugerido: 20 segundos**
 
-Transición:
+“Buenas tardes. Presentaremos Painted Wolf Optimization, o PWO. Nos
+concentraremos en cómo el algoritmo transforma una población actual en una
+nueva población mediante ecuaciones de movimiento en el dominio real.”
 
-“Para eso, primero tenemos que traducir la metáfora del lobo a conceptos de
-optimización.”
+**Transición**
 
-## Diapositiva 2 - Maverick - 55 segundos
+“Comencemos con el comportamiento que da origen al algoritmo.”
 
-“Cada lobo es simplemente una solución candidata. Su posición es un vector de
-dimensión $d$, y cada componente del vector es una variable de decisión.
+## Lámina 2. Contexto breve de PWO
 
-El índice $i$ identifica la solución, $j$ identifica la variable y $t$
-identifica la iteración. La función objetivo recibe el vector completo y
-devuelve un fitness que permite comparar asignaciones.
+**Tiempo sugerido: 50 segundos**
 
-Por lo tanto, cuando el paper habla de mover un lobo, lo que realmente ocurre es
-que se construye un nuevo vector $\mathbf{X}_i(t+1)$.”
+“El autor se inspira en los licaones africanos, también llamados painted
+wolves. Antes de una caza, la manada realiza un rally en el que sus integrantes
+expresan su disposición a participar. La influencia del alfa modifica esta
+decisión colectiva.
 
-Transición:
+PWO traduce esa conducta a una decisión de búsqueda. La manada es la población,
+el rally decide entre exploración y explotación, y el alfa representa la mejor
+solución registrada.
 
-“La primera construcción ocurre incluso antes de comenzar a iterar.”
+Este contexto permite entender los nombres de las fases. Ahora debemos
+traducir cada lobo a una representación matemática.”
 
-## Diapositiva 3 - Maverick - 60 segundos
+**Transición**
 
-“Cada variable se inicializa con un número uniforme dentro de su dominio. La
-ecuación toma el límite inferior y agrega una fracción aleatoria del ancho del
-intervalo.
+“En PWO, cada agente es una solución candidata.”
 
-Después se evalúan todas las soluciones y la de menor fitness se conserva como
-alfa. El alfa no es una categoría biológica relevante para nosotros: es el mejor
-vector encontrado.
+## Lámina 3. Representación
 
-Si una ecuación produce un valor fuera del dominio, el código oficial lo repara
-por saturación: todo valor superior queda en el máximo y todo valor inferior en
-el mínimo.”
+**Tiempo sugerido: 55 segundos**
 
-Transición:
+“Cada agente \(i\) se representa mediante un vector de dimensión \(d\). Cada
+componente \(X_{i,j}(t)\) es el valor de la variable de decisión \(j\) en la
+iteración \(t\).
 
-“Con la población evaluada, PWO todavía no mueve. Primero decide qué tipo de
-movimiento realizará.”
+La función objetivo evalúa el vector completo y entrega un fitness. Así se
+comparan las asignaciones y se conserva la mejor observada, denominada alfa.
 
-## Diapositiva 4 - Maverick - 90 segundos
+Cuando el paper habla de mover un lobo, la operación matemática es construir
+un nuevo vector \(\mathbf{X}_i(t+1)\).”
 
-“La decisión utiliza un rally. El parámetro $a(t)$ disminuye linealmente y se
-usa para calcular la influencia del alfa, que llamamos $L(t)$.
+**Transición**
 
-Cada agente no alfa vota cuando su fitness satisface la condición definida por
-el paper. Cada voto suma 0.04 a la fuerza $R(t)$. Paralelamente se calcula un
-umbral aleatorio $H(t)$.
+“Veamos en qué momento del algoritmo se construye ese vector.”
 
-La comparación selecciona la fase: si la fuerza es menor al umbral, la población
-explora; si la fuerza alcanza o supera el umbral, explota.
+## Lámina 4. Ciclo del algoritmo
 
-La distinción importante es que ni el voto ni el umbral asignan todavía valores
-a las variables. Solo escogen qué ecuación hará esa asignación.”
+**Tiempo sugerido: 60 segundos**
 
-Transición:
+“PWO comienza con una población real. Al inicio de cada iteración repara las
+variables fuera del dominio, evalúa las soluciones y actualiza el alfa.
 
-“Esa elección abre tres rutas posibles.”
+Luego calcula los parámetros del rally y decide si la población explorará o
+explotará. La rama elegida aplica una ecuación de movimiento y genera
+\(\mathbf{X}_i(t+1)\).
 
-## Diapositiva 5 - Maverick - 55 segundos
+Los nuevos vectores se reparan y evalúan al comenzar la iteración siguiente.
+Por tanto, el proceso separa tres acciones: evaluar, seleccionar una regla y
+asignar nuevos valores.”
 
-“En exploración hay dos estrategias y se seleccionan con probabilidad 0.5. La
-primera utiliza un agente aleatorio. La segunda combina el alfa con la media de
-la población. En explotación, cada dimensión se actualiza directamente con
-respecto al alfa.
+**Transición**
 
-Rogelio explicará ahora cómo cada una construye el nuevo vector.”
+“La primera asignación ocurre cuando se genera la población inicial.”
 
-## Diapositiva 6 - Rogelio - 90 segundos
+## Lámina 5. Inicialización
 
-“La primera exploración selecciona una solución aleatoria y una dimensión
-$j$. Con esa dimensión calcula una distancia perturbada.
+**Tiempo sugerido: 60 segundos**
 
-Luego ocurre la característica más particular del algoritmo: el resultado es
-un escalar, pero el paper indica que se asigna al vector completo. Es decir, la
-información de una dimensión puede redefinir todas las variables del agente.
+“Para cada agente y cada dimensión se genera un número uniforme entre cero y
+uno. Ese número se escala al intervalo definido por los límites de la variable.
 
-Esto promueve movimientos amplios, pero también es un punto que debemos mirar
-con cuidado al reproducir el algoritmo, porque el código ejecuta la escritura
-vectorial dentro del ciclo de dimensiones.”
+Así, cada \(X_{i,j}(0)\) recibe un valor real dentro de su dominio. Después se
+evalúan todos los vectores y el menor fitness se registra como
+`Alpha_score`; su posición se conserva como `Alpha_pos`.
 
-Transición:
+El paper indica una inicialización aleatoria y las implementaciones la
+concretan mediante esta ecuación uniforme.”
 
-“La segunda exploración sí trabaja directamente con vectores.”
+**Transición**
 
-## Diapositiva 7 - Rogelio - 70 segundos
+“Con la población evaluada, el rally selecciona la ecuación de movimiento.”
 
-“Esta ecuación tiene dos componentes. El primero es el alfa menos la media de la
-población y entrega una dirección global. El segundo es la distancia absoluta
-entre el alfa y el agente, ponderada por la fuerza del rally.
+## Lámina 6. Rally
 
-Así, todos los agentes reciben información de la mejor solución y del centro de
-la población, pero el resultado sigue dependiendo de la posición particular de
-cada uno.”
+**Tiempo sugerido: 80 segundos**
 
-Transición:
+“El parámetro \(a(t)\) disminuye con las iteraciones y permite calcular la
+influencia \(L(t)\). Cada agente no alfa vota cuando su fitness cumple la
+condición del paper. Cada voto suma 0.04 a la fuerza \(R(t)\).
 
-“Cuando el rally decide explotar, la asignación es más directa.”
+También se calcula un umbral estocástico \(H(t)\). Si \(R(t)\) es menor que
+\(H(t)\), la población explora. Si \(R(t)\) alcanza o supera el umbral,
+explota.
 
-## Diapositiva 8 - Rogelio - 80 segundos
+La comparación es global para la iteración. Sin embargo, ni \(R(t)\) ni
+\(H(t)\) producen directamente un nuevo valor. Solo seleccionan la ecuación
+que lo hará.”
 
-“Para cada variable $j$ calculamos primero su distancia al valor correspondiente
-del alfa. Después calculamos $A_2$, que combina fuerza del rally, el parámetro
-de control y un número aleatorio.
+**Transición**
 
-Finalmente, al valor del alfa le restamos la distancia ponderada. Esta ecuación
-responde de forma explícita la pregunta del avance: el nuevo valor de
-$X_{i,j}$ es el valor del alfa en la misma dimensión menos una perturbación.
+“Rogelio explicará las tres ecuaciones que pueden generar la nueva población.”
 
-La operación se repite para cada variable.”
+## Lámina 7. Exploración 1
 
-Transición:
+**Tiempo sugerido: 75 segundos**
 
-“Veamos una iteración con números fijos.”
+“La primera exploración selecciona un agente aleatorio y una dimensión \(j\).
+Con esa componente calcula una distancia perturbada.
 
-## Diapositiva 9 - Rogelio - 110 segundos
+Luego combina la distancia con \(a(t)\) y un número aleatorio. El resultado es
+un escalar que el paper asigna al vector completo del agente.
 
-“Usamos la función Sphere de dos dimensiones. El agente que actualizaremos es
-$(1.01,1.00)$, con fitness 2.0201, y el alfa es
-$(1.00,0.99)$, con fitness 1.9801.
+Esta actualización escalar-a-vector es la característica más particular de la
+rama. El código realiza la escritura dentro del ciclo de dimensiones, por lo
+que una componente del agente aleatorio puede redefinir todas las variables del
+agente actual.”
 
-Fijamos los números aleatorios para que el cálculo sea reproducible. El rally
-selecciona explotación y obtenemos $A_2=0.1088$.
+**Transición**
 
-En la primera dimensión la distancia al alfa es 0.01. Al multiplicarla por
-$A_2$ y restarla a 1.00, el nuevo valor es 0.998912.
+“La segunda exploración trabaja directamente con vectores.”
 
-En la segunda dimensión la distancia también es 0.01. Restando la perturbación
-a 0.99, obtenemos 0.988912.
+## Lámina 8. Exploración 2
 
-La nueva solución tiene fitness 1.975772. Por lo tanto, mejora al agente
-original y también al alfa previo. Ninguna variable sale del dominio.”
+**Tiempo sugerido: 65 segundos**
 
-Transición:
+“Primero se calcula la media de la población. Luego se resta esa media al alfa.
+La ecuación también calcula la distancia absoluta entre el alfa y el agente, y
+la pondera mediante la fuerza del rally.
 
-“Además del cálculo manual, ejecutamos el código entregado por el autor.”
+Al restar ambos términos se obtiene directamente
+\(\mathbf{X}_i(t+1)\). Todas las variables se actualizan en una operación
+vectorial.
 
-## Diapositiva 10 - Maverick - 70 segundos
+Interpretamos la diferencia entre alfa y media como información global de la
+población. Esta lectura es una interpretación geométrica del equipo basada en
+la ecuación publicada.”
 
-“Probamos la implementación Python oficial en Sphere con tres dimensiones, 20
-agentes, 100 iteraciones y una semilla fija.
+**Transición**
 
-El mejor fitness bajó desde aproximadamente 4281 hasta
-$2.52\times10^{-92}$. La prueba confirma que el código se ejecuta y converge
-en este caso sencillo.
+“Cuando el rally selecciona explotación, el cálculo se expresa por variable.”
 
-No usamos este resultado para afirmar que PWO es superior. Es una sola semilla,
-una sola función y todavía no estamos reproduciendo el protocolo experimental
-del artículo.”
+## Lámina 9. Explotación
 
-Transición:
+**Tiempo sugerido: 80 segundos**
 
-“Al contrastar la ejecución con el paper encontramos aspectos que debemos
-resolver.”
+“Para la variable \(j\), primero se calcula la distancia entre el valor del
+agente y el valor correspondiente del alfa. Después se construyen \(A_1\) y
+\(A_2\), que combinan el parámetro de control, la fuerza del rally, la
+influencia y un número aleatorio.
 
-## Diapositiva 11 - Maverick - 90 segundos
+Finalmente, \(X_{i,j}(t+1)\) recibe el valor del alfa en esa dimensión menos
+la distancia ponderada por \(A_2\).
 
-“El artículo, el pseudocódigo y las dos implementaciones no coinciden en todos
-los detalles.
+Esta ecuación responde directamente la pregunta central: muestra qué valor
+recibe cada variable en la iteración siguiente. La referencia en el alfa no
+garantiza que cada movimiento individual reduzca la distancia.”
 
-Por ejemplo, el código usa un número aleatorio adicional al calcular el umbral.
-Python evita que $a(t)$ llegue a cero, mientras MATLAB puede dividir por cero
-en la última iteración. Además, la población generada en la última actualización
-no vuelve a evaluarse y las operaciones vectoriales están dentro del ciclo de
-dimensiones.
+**Transición**
 
-Para este avance usamos el paper como formulación académica y Python como
-referencia operacional. No corregiremos silenciosamente estas diferencias: cada
-decisión quedará registrada y probada.”
+“Sigamos ahora una actualización completa con números fijos.”
 
-Transición:
+## Lámina 10. Ruteo: selección de la rama
 
-“Con esto podemos precisar qué está terminado y qué sigue.”
+**Tiempo sugerido: 80 segundos**
 
-## Diapositiva 12 - Maverick - 65 segundos
+“Usamos Sphere en dos dimensiones y una población de tres agentes. El agente 3,
+con posición \((1.00,0.99)\) y fitness 1.9801, es el alfa.
 
-“El avance deja definida la representación, la inicialización, el rally y las
-tres ecuaciones de movimiento. También deja un ruteo verificable, una ejecución
-preliminar y una lista de decisiones de reproducibilidad.
+Fijamos \(T=10\), \(t=1\) y la constante de voto en 0.04. Obtenemos
+\(a=1.8\) y \(L=0.022222\).
 
-El siguiente paso es estabilizar la versión continua, reproducir un conjunto de
-funciones benchmark y recién entonces incorporar una estrategia de
-binarización y un problema discreto.
+Los agentes 1 y 2 cumplen la condición de voto, por lo que \(R=0.08\).
+Fijando \(r_3=0.2\) y \(r_4=0.4\), el umbral publicado da \(H=0\).
 
-La conclusión principal es sencilla: antes de transformar PWO al dominio
-binario, necesitamos fijar con precisión cómo asigna valores en el dominio real.
-Esa base queda establecida en este avance.”
+Como \(R\) es mayor o igual que \(H\), la iteración selecciona explotación.
+Hasta aquí hemos elegido la ecuación; ahora calcularemos los valores.”
+
+**Transición**
+
+“Actualizaremos las dos variables del agente 1.”
+
+## Lámina 11. Ruteo: asignación y evaluación
+
+**Tiempo sugerido: 105 segundos**
+
+“Fijamos \(r_1=0.7\). Con ese valor obtenemos \(A_1=0.72\) y
+\(A_2=0.1088\).
+
+Para la primera variable, la distancia entre 1.01 y el valor 1.00 del alfa es
+0.01. Multiplicamos esa distancia por \(A_2\) y la restamos a 1.00. El nuevo
+valor es 0.998912.
+
+Para la segunda variable, la distancia entre 1.00 y el valor 0.99 del alfa
+también es 0.01. La misma operación produce 0.988912.
+
+La nueva solución es \((0.998912,0.988912)\). Ambas variables permanecen en el
+intervalo permitido, por lo que no requieren reparación.
+
+Al evaluarla en Sphere, el fitness pasa de 2.0201 a 1.975772. En la evaluación
+siguiente, este agente reemplazaría al alfa anterior.
+
+El ruteo muestra el ciclo completo: evaluar, seleccionar una rama, asignar cada
+variable, comprobar el dominio y volver a evaluar.”
+
+**Transición**
+
+“Antes de cerrar, podemos señalar qué queda por resolver en la implementación.”
+
+## Lámina 12. Comprobación y decisiones pendientes
+
+**Tiempo sugerido: 45 segundos**
+
+“La implementación Python oficial redujo el fitness en Sphere con una semilla
+fija. Esta prueba confirma funcionamiento en un caso sencillo, pero no
+demuestra superioridad frente a otros algoritmos.
+
+También encontramos diferencias entre el paper y el código: el umbral no usa
+exactamente los mismos aleatorios, existe una discrepancia entre 0.04 y 0.05,
+Python y MATLAB tratan de forma distinta el último valor de \(a(t)\), y algunas
+escrituras se repiten dentro del ciclo de dimensiones.
+
+Estas diferencias deben resolverse antes de fijar una implementación de
+referencia.”
+
+**Transición**
+
+“Con esto podemos delimitar la siguiente etapa del proyecto.”
+
+## Lámina 13. Cierre
+
+**Tiempo sugerido: 35 segundos**
+
+“PWO representa cada solución como un vector real. El rally selecciona una
+regla y las dos estrategias de exploración o la explotación generan
+\(\mathbf{X}_i(t+1)\).
+
+El ruteo mostró cómo se asignan y evalúan los nuevos valores. El siguiente paso
+será estabilizar esta dinámica continua y, sobre esa base, definir la
+binarización para un problema discreto.”
 
 ## Preguntas previsibles
 
-### ¿Por qué eligieron este algoritmo?
+### ¿Por qué el rally no es una ecuación de movimiento?
 
-“Porque fue publicado en 2026, tiene ecuaciones continuas identificables y
-dispone de código oficial en Python y MATLAB, lo que permite contrastar fórmula
-e implementación.”
+“Porque \(R(t)\) y \(H(t)\) seleccionan una rama, pero no producen directamente
+\(X_{i,j}(t+1)\). La asignación aparece en una de las ecuaciones de exploración
+o explotación.”
 
-### ¿PWO es realmente diferente de Grey Wolf Optimizer?
+### ¿Por qué el ruteo usa explotación?
 
-“El autor declara mecanismos distintos: rally de votación, influencia dinámica
-del alfa y dos estrategias probabilísticas de exploración. En este avance no
-evaluamos todavía si esa novedad se traduce en una ventaja experimental.”
+“Porque esta ecuación expresa la actualización para cada dimensión y permite
+seguir qué valor recibe cada variable. Las dos ramas de exploración se explican
+antes del ejemplo.”
 
-### ¿Por qué no binarizaron todavía?
+### ¿La nueva solución siempre mejora?
 
-“El foco explícito del avance es la asignación en reales. Binarizar antes de
-estabilizar esa dinámica trasladaría ambigüedades del algoritmo continuo a la
-versión discreta.”
+“No. Las ecuaciones proponen nuevas posiciones y la función objetivo determina
+su calidad. En el ejemplo la solución mejora, pero no existe garantía de mejora
+individual.”
 
-### ¿Qué versión van a implementar?
+### ¿Qué ocurre si una variable sale del dominio?
 
-“El paper es la especificación académica y Python la referencia operacional.
-Prepararemos variantes controladas para las discrepancias identificadas y las
-compararemos con semillas y presupuestos de evaluación equivalentes.”
+“La implementación aplica saturación: reemplaza el valor por el límite inferior
+o superior correspondiente.”
 
-### ¿El resultado de Sphere demuestra superioridad?
+### ¿Por qué no se incluye la binarización?
 
-“No. Solo demuestra funcionamiento en un caso controlado. La superioridad exige
-múltiples funciones, algoritmos comparadores, repeticiones y análisis
-estadístico.”
+“Porque el profesor reservó la binarización para el informe final. Este avance
+se concentra en comprender la dinámica real.”
 
-### ¿El otro Painted Wolf Decision Optimizer es el mismo algoritmo?
+### ¿Sphere demuestra que PWO es superior?
 
-“No. Es un marco determinista para decisión multicriterio discreta, publicado
-por otros autores. Nuestro PWO es la metaheurística continua y estocástica de
-Sheikhi.”
+“No. Solo comprueba que la implementación se ejecuta y reduce el fitness en un
+caso controlado.”
 
+### ¿Qué versión se implementará?
+
+“El paper contiene la formulación publicada y el código muestra una ejecución
+concreta con algunas diferencias. Se compararán variantes controladas antes de
+fijar una versión.”
+
+### ¿The Painted Wolf Decision Optimizer es el mismo algoritmo?
+
+“El corpus conserva su referencia bibliográfica, pero no el texto completo. Por
+eso no se afirma cómo funciona ni se realiza una comparación metodológica. En
+esta presentación, PWO designa exclusivamente la metaheurística de Sheikhi.”

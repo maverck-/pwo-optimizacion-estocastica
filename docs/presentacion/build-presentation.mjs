@@ -306,7 +306,7 @@ async function main() {
     title: titleToken("El rally decide qué ecuación moverá a la población"),
     body1: body(
       "Señales",
-      "a(t) = 2(1 − t/T)\nL(t) = |0.04 / a(t)|\n\nCada agente cercano al alfa aporta un voto de 0.04 a R(t).",
+      "a(t) = 2(1 − t/T)\nL(t) = |0.04 / a(t)|\n\nCada agente cuyo fitness satisface la condición aporta un voto de 0.04 a R(t).",
     ),
     body2: body(
       "Decisión global",
@@ -373,7 +373,7 @@ async function main() {
     title: titleToken("Exploración 2: dirección global más ajuste individual"),
     body1: body(
       "Dirección global",
-      "Xα − X̄\n\nConecta la mejor solución con el centro de la población.",
+      "Xα − X̄\n\nLectura del equipo: conecta el mejor registro con el centro poblacional.",
     ),
     body2: body(
       "Nueva posición",
@@ -477,7 +477,7 @@ async function main() {
 
   // 10. Prueba preliminar
   const slide10 = buildSlide21(presentation, {
-    title: titleToken("La implementación oficial converge en Sphere"),
+    title: titleToken("La ejecución oficial reduce el fitness en Sphere"),
     body1: paragraph(
       "Prueba controlada: d = 3 · 20 agentes · 100 iteraciones · semilla 20260728",
       20,
@@ -545,7 +545,7 @@ async function main() {
     title: titleToken("Discrepancias que afectan la reproducibilidad"),
     body1: {
       topic: paragraph(
-        "Las diferencias no se corrigen silenciosamente: se documentan y se prueban como variantes.",
+        "Paper y código se tratan como fuentes distintas: las diferencias se documentan y se prueban como variantes.",
         20,
         ORANGE,
         true,
@@ -576,7 +576,7 @@ async function main() {
   addDecoration(slide11, 11, "PWO · REPRODUCIBILIDAD");
   addNotes(
     slide11,
-    "Destacar cuatro discrepancias que afectan la reproducción. Para el avance, el artículo es la formulación académica y Python la referencia operacional; las diferencias se conservarán como decisiones experimentales trazables.",
+    "Destacar cuatro discrepancias que afectan la reproducción. Para el avance, el artículo y el código son fuentes distintas; sus diferencias se conservarán como decisiones experimentales trazables.",
     [
       "Sheikhi (2026), Algorithm 1 y ecuaciones 1–9.",
       "Repositorio oficial: Python/PWO.py y Matlab/PWO.m.",
@@ -641,7 +641,9 @@ async function main() {
   await writeBlob(new URL("deck-montage.webp", OUT_DIR), montage);
 
   const pptx = await PresentationFile.exportPptx(presentation);
-  await pptx.save(fileURLToPath(FINAL_PPTX));
+  const finalPath = fileURLToPath(FINAL_PPTX);
+  await pptx.save(finalPath);
+  await fs.rm(`${finalPath}.inspect.ndjson`, { force: true });
 }
 
 main().catch((error) => {

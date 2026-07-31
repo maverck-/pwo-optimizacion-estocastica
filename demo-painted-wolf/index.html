@@ -26,7 +26,7 @@
     <button id="btn-paisaje" class="btn-redondo btn-sec" title="Nuevo terreno (N)" aria-label="Nuevo terreno">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6l-3.7 4.9 2.8 3.7-1.6 1.2L8 11 2 19h20L14 6z"/></svg>
     </button>
-    <button id="btn-variante" class="btn-redondo btn-sec" title="Rama de exploración: literal del paper o por componente (E)" aria-label="Cambiar variante de exploración">
+    <button id="btn-variante" class="btn-redondo btn-sec" title="Rama de exploración: literal del código oficial o por componente (E)" aria-label="Cambiar variante de exploración">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v10.2a3 3 0 1 0 2 0V3H7zm10 0v6.2a3 3 0 1 0 2 0V3h-2z"/></svg>
     </button>
     <span class="info-wrap">
@@ -41,13 +41,13 @@
         <li><span class="tag">X<sub>i</sub></span><span>Posición del agente i: una solución del problema</span></li>
         <li><span class="tag">X<sub>α</sub></span><span>Alfa: la mejor solución encontrada hasta ahora</span></li>
         <li><span class="tag">t, T</span><span>Iteración actual y máximo de iteraciones (parada)</span></li>
-        <li><span class="tag tag-formula">a(t) = 2(1 − t/T)</span><span>Parámetro de control: baja de 2 a 0 durante la corrida</span></li>
+        <li><span class="tag tag-formula">a(t) = 2(1 − t/T)</span><span>Parámetro de control: disminuye desde 2 hacia 0</span></li>
         <li><span class="tag">c</span><span>Incremento de voto: cuánto aporta cada lobo al rally</span></li>
         <li><span class="tag tag-formula">L(t) = |c / a(t)|</span><span>Influencia del alfa: crece a medida que a(t) baja</span></li>
         <li><span class="tag tag-formula">R = c · votos</span><span>Fuerza del rally: vota quien cumple F<sub>i</sub> − L·F<sub>α</sub> ≤ F<sub>α</sub></span></li>
-        <li><span class="tag tag-formula">H = round(a(2r₃ − r₄)/L + r₄)</span><span>Umbral estocástico contra el que se compara el rally</span></li>
+        <li><span class="tag tag-formula">H = round(a(2r₃ − r₄)/L + r₅)</span><span>Umbral de la demo, con un tercer aleatorio en el término final</span></li>
         <li><span class="tag">R &lt; H</span><span>Decisión global: si se cumple la manada explora, si no explota</span></li>
-        <li><span class="tag tag-formula">A₂ = R + a·A₁·L</span><span>Coeficiente que acerca cada agente al alfa en explotación</span></li>
+        <li><span class="tag tag-formula">A₂ = R + a·A₁·L</span><span>Coeficiente usado para actualizar cada agente con referencia en el alfa</span></li>
       </ul>
 
       <p class="etiqueta">Cómo leer la escena</p>

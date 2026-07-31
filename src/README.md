@@ -1,6 +1,7 @@
-# Código fuente
+# Implementación del proyecto
 
-Aquí se desarrollará la implementación reproducible del proyecto.
+Esta carpeta está reservada para la implementación reproducible que se
+desarrollará a partir del análisis del paper y del código oficial.
 
 Reglas:
 
@@ -9,4 +10,3 @@ Reglas:
 3. Las semillas aleatorias, parámetros y funciones objetivo deben quedar
    registradas.
 4. La versión continua se estabiliza antes de incorporar binarización.
-

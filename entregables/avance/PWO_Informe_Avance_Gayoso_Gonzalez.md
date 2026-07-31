@@ -15,36 +15,37 @@ rally previo a la caza de los licaones africanos. El presente informe de avance
 estudia el mecanismo continuo del algoritmo y, en particular, la forma en que
 asigna nuevos valores reales a las variables de decisión. Cada agente representa
 una solución candidata y cada dimensión de su posición corresponde a una
-variable del problema. En cada iteración, PWO evalúa la población, identifica la
-mejor solución o alfa y calcula una fuerza de rally. La comparación de esa fuerza
-con un umbral estocástico selecciona una de tres reglas de movimiento: dos
-estrategias de exploración y una de explotación. El trabajo formaliza estas
+variable del problema. En cada iteración, PWO evalúa la población, actualiza la
+mejor solución observada y calcula una fuerza de rally. La comparación de esa
+fuerza con un umbral estocástico selecciona una de tres reglas de movimiento:
+dos estrategias de exploración y una de explotación. El trabajo formaliza estas
 reglas con una nomenclatura común, presenta un ruteo numérico de una iteración y
-contrasta la formulación publicada con la implementación oficial en Python y
-MATLAB. La prueba preliminar sobre la función Sphere confirma que el código
-Python puede reducir el fitness en un escenario controlado, aunque no constituye
-una reproducción completa de los resultados del artículo. El análisis también
-identifica diferencias entre paper, pseudocódigo y código que deben resolverse
-antes de la fase experimental. La binarización y la aplicación a un problema
-discreto se reservan para el informe final.
+contrasta la formulación publicada con las implementaciones en Python y MATLAB
+del repositorio de los autores. Una prueba preliminar sobre la función Sphere
+muestra que el código Python reduce el fitness en un escenario controlado,
+aunque no constituye una reproducción de los resultados del artículo. El
+análisis también identifica diferencias entre paper, pseudocódigo y código que
+requieren decisiones explícitas antes de la fase experimental. La binarización
+y la aplicación a un problema discreto se reservan para el informe final.
 
 **Palabras clave:** optimización estocástica, metaheurística poblacional,
 Painted Wolf Optimization, ecuación de movimiento, exploración, explotación.
 
 ## 1. Introducción
 
-Los problemas de optimización reales pueden presentar espacios de búsqueda de
-gran tamaño, funciones no convexas, múltiples óptimos locales o restricciones
-que vuelven impracticable la enumeración exhaustiva. Las metaheurísticas
-abordan estos escenarios mediante reglas generales de búsqueda que intentan
-obtener soluciones de buena calidad con un costo computacional razonable. En
-los métodos poblacionales, varias soluciones candidatas exploran
-simultáneamente el espacio y comparten información durante el proceso.
+Los problemas de optimización pueden presentar espacios de búsqueda extensos,
+funciones no convexas, múltiples óptimos locales o restricciones que dificultan
+la enumeración exhaustiva. Las metaheurísticas abordan estos escenarios mediante
+reglas de búsqueda aproximada. En los métodos poblacionales, varias soluciones
+candidatas exploran simultáneamente el espacio y comparten información durante
+el proceso.
 
 Painted Wolf Optimization (PWO) fue presentado por Sheikhi en 2026 como una
 metaheurística poblacional inspirada en el comportamiento social y de caza del
 licaón africano [1]. El artículo propone un rally de votación para decidir si la
-población continúa explorando o converge hacia la mejor solución conocida.
+población continúa explorando o activa una actualización con referencia en la
+mejor solución conocida.
+
 Además de funciones benchmark, el autor reporta aplicaciones en problemas de
 diseño de ingeniería y en el entrenamiento de un sistema de detección de
 intrusiones. Estos resultados son antecedentes del método, pero todavía no han
@@ -68,8 +69,8 @@ Las contribuciones de este avance son:
 2. una explicación paso a paso de las ecuaciones que generan valores reales;
 3. un ruteo numérico reproducible de una actualización de explotación;
 4. un mapeo entre ecuaciones y código oficial;
-5. una lista de diferencias que deben resolverse antes de la experimentación
-   final.
+5. una lista de diferencias que requieren decisiones de implementación antes
+   de la experimentación final.
 
 ## 2. Antecedentes y alcance
 
@@ -114,10 +115,27 @@ $$
 
 El elemento $X_{i,j}(t)$ es el valor real de la variable $j$ de la
 solución $i$ en la iteración $t$. La población se evalúa mediante
-$f(\mathbf{X}_i(t))$. En un problema de minimización, la solución alfa es la
-de menor fitness observado.
+$f(\mathbf{X}_i(t))$. El paper denomina alfa a la mejor solución encontrada.
+Las implementaciones conservan ese registro entre iteraciones, por lo que en
+este informe el alfa se trata como el mejor histórico y no necesariamente como
+el mejor agente de la población actual.
 
-### 2.2 Trabajo seleccionado
+### 2.2 Contexto del algoritmo
+
+El paper se inspira en la búsqueda cooperativa y en el rally previo a la caza
+de los licaones africanos. Durante ese rally, los integrantes de la manada
+expresan su disposición a participar y la influencia del alfa modifica la
+decisión colectiva [1]. El autor traduce este comportamiento a una selección
+entre dos modos: continuar buscando, representado como exploración, o iniciar
+una actualización con referencia en el alfa, representada como explotación.
+
+La correspondencia computacional es directa: la manada es una población, cada
+licaón es una solución, su posición es un vector de variables, el alfa es la
+mejor solución registrada y el rally selecciona la ecuación de movimiento. Esta
+traducción permite conservar el contexto del método sin confundir la metáfora
+con el mecanismo matemático.
+
+### 2.3 Trabajo seleccionado
 
 El trabajo principal es *Painted Wolf Optimization: A Novel Nature-Inspired
 Metaheuristic Algorithm for Real-World Optimization Problems*, publicado el 12
@@ -125,28 +143,28 @@ de marzo de 2026 [1]. La selección se justificó por su actualidad, la
 disponibilidad de código oficial en Python y MATLAB [2] y la presencia explícita
 de ecuaciones de movimiento en el dominio continuo.
 
-Existe otra publicación posterior que utiliza el mismo animal y el acrónimo
-PWO: *The Painted Wolf Decision Optimizer*, de Zakeri, Konstantas y Chatterjee
-[3]. Ese trabajo propone un marco determinista para decisión multicriterio
-discreta. No es una versión del algoritmo de Sheikhi ni la binarización que
-desarrollará este proyecto. En lo sucesivo, **PWO** se refiere exclusivamente a
-la metaheurística continua y estocástica de Sheikhi.
+El corpus también contiene la referencia bibliográfica de *The Painted Wolf
+Decision Optimizer*, de Zakeri, Konstantas y Chatterjee [3], pero no incluye el
+texto completo de ese artículo. Por tanto, este avance no compara sus mecanismos
+con los de Sheikhi. En lo sucesivo, **PWO** se refiere exclusivamente a la
+metaheurística continua y estocástica estudiada en [1].
 
-### 2.3 Alcance del avance
+### 2.4 Alcance del avance
 
 Este informe se concentra en el dominio de los reales. No se propone todavía
 una función de transferencia binaria, un operador discreto ni una estrategia de
 reparación para problemas combinatorios. La fase experimental también es
-preliminar: se verifica que una implementación se ejecuta y mejora una función
-sencilla, pero no se pretende validar aún la superioridad estadística reportada
-por el autor.
+preliminar: se verifica que una implementación se ejecuta y reduce el fitness
+en una función sencilla, pero no se pretende validar aún la superioridad
+estadística reportada por el autor.
 
 ## 3. Método Painted Wolf Optimization
 
 ### 3.1 Inicialización de la población
 
-Para cada agente $i$ y cada variable $j$, PWO genera una posición aleatoria
-dentro del dominio:
+El pseudocódigo del paper indica que la población se inicializa con posiciones
+aleatorias. Las implementaciones concretan esa instrucción, para cada agente
+$i$ y cada variable $j$, mediante:
 
 $$
 X_{i,j}(0)
@@ -170,24 +188,27 @@ F_i(t)=f(\mathbf{X}_i(t)).
 \tag{2}
 $$
 
-La mejor solución hasta el momento se define como:
+La mejor solución histórica hasta la iteración $t$ se define como:
 
 $$
-\alpha(t)
-=
-\arg\min_i F_i(t),
+(\tau^\ast,i^\ast)
+\in
+\arg\min_{\substack{0\leq \tau\leq t\\1\leq i\leq N}}
+F_i(\tau),
 \qquad
-\mathbf{X}_{\alpha}(t)=\mathbf{X}_{\alpha(t)}(t).
+\mathbf{X}_{\alpha}(t)=\mathbf{X}_{i^\ast}(\tau^\ast).
 \tag{3}
 $$
 
-El código conserva el mejor valor histórico en `Alpha_score` y su vector en
-`Alpha_pos`.
+El código conserva el valor correspondiente en `Alpha_score`, su vector en
+`Alpha_pos` y el índice del agente que obtuvo el registro en `Alpha_index`.
+Después de un movimiento, `Alpha_pos` puede dejar de coincidir con la posición
+actual de ese agente.
 
 ### 3.2 Parámetro de control e influencia del alfa
 
 El artículo señala que el parámetro $a(t)$ decrece linealmente desde 2 hasta
-0:
+0. El código Python implementa esa variación como:
 
 $$
 a(t)
@@ -217,7 +238,7 @@ comportamiento resulta de su interacción con el resto de los términos.
 
 ### 3.3 Rally y selección del modo de búsqueda
 
-Cada agente no alfa emite un voto si:
+La formulación indica que cada agente no alfa emite un voto si:
 
 $$
 F_i(t)-L(t)F_{\alpha}(t)
@@ -266,8 +287,11 @@ R(t)\geq H(t), & \text{explotación}.
 \tag{9}
 $$
 
-Cuando corresponde explorar, un nuevo número aleatorio
-$q\sim U(0,1)$ selecciona una de dos estrategias con probabilidad 0.5.
+Cuando corresponde explorar, un número aleatorio
+$q\sim U(0,1)$ selecciona una de dos estrategias con probabilidad 0.5. En el
+pseudocódigo, esta selección ocurre dentro de la actualización de cada agente;
+en las implementaciones, $q$ se vuelve a generar dentro del ciclo de
+dimensiones.
 
 ### 3.4 Exploración 1: seguimiento de un agente aleatorio
 
@@ -298,13 +322,12 @@ D_{i,j}^{rand}(t).
 \tag{11}
 $$
 
-La ecuación 11 es particular porque produce un escalar a partir de la dimensión
-$j$ y lo asigna al vector completo $\mathbf{X}_i$. El paper describe
-explícitamente esta actualización escalar-a-vector como un mecanismo para que
-la información de una dimensión influya en la dirección global de búsqueda.
-Operacionalmente, esto significa que, en esa actualización, todas las variables
-del agente reciben el mismo valor escalar. Esta característica debe conservarse
-si se pretende reproducir literalmente el artículo.
+La ecuación 11 produce un escalar a partir de la dimensión $j$ y lo asigna al
+vector completo $\mathbf{X}_i$. El paper describe esta actualización
+escalar-a-vector como un mecanismo para que la información de una dimensión
+influya en la dirección global de búsqueda. En una lectura literal, todas las
+variables del agente reciben el mismo valor escalar en cada ejecución de la
+ecuación.
 
 ### 3.5 Exploración 2: coordinación con alfa y media poblacional
 
@@ -336,14 +359,18 @@ $$
 \tag{13}
 $$
 
-La resta $\mathbf{X}_{\alpha}-\overline{\mathbf{X}}$ introduce una dirección
-global entre la mejor solución y el centro de la población. El segundo término
-ajusta cada componente según la distancia absoluta del agente al alfa,
-ponderada por la fuerza del rally.
+La resta $\mathbf{X}_{\alpha}-\overline{\mathbf{X}}$ puede interpretarse como
+una dirección global entre el mejor registro y el centro de la población. El
+segundo término ajusta cada componente según la distancia absoluta del agente al
+alfa, ponderada por la fuerza del rally. Esta lectura geométrica es una
+interpretación del equipo a partir de la ecuación 12.
 
-### 3.6 Explotación: convergencia hacia el alfa
+### 3.6 Explotación: actualización con referencia en el alfa
 
-Cuando $R(t)\geq H(t)$, PWO actualiza cada variable en dirección al alfa:
+El paper denomina explotación a la rama activada cuando $R(t)\geq H(t)$ y la
+describe como una convergencia hacia el alfa. La ecuación toma el alfa como
+referencia, aunque un movimiento individual no tiene garantizado reducir su
+distancia:
 
 $$
 D_{i,j}^{\alpha}(t)
@@ -406,7 +433,11 @@ Si una variable excede el límite superior, se reemplaza por $ub_j$; si cae
 por debajo del límite inferior, se reemplaza por $lb_j$. Para las funciones
 continuas sin otras restricciones, esta operación recupera la factibilidad.
 
-### 3.8 Pseudocódigo operacional
+### 3.8 Pseudocódigo operacional de referencia
+
+El siguiente pseudocódigo resume el orden de ejecución de las implementaciones
+locales. Difiere del pseudocódigo publicado en el momento de evaluación, aspecto
+que se detalla en la sección 5.2.
 
 ```text
 Inicializar N soluciones reales dentro de [lb, ub]
@@ -432,10 +463,6 @@ Para t = 1, ..., T:
 
 Retornar Alpha_pos y Alpha_score
 ```
-
-La estructura dominante es $T\times N\times d$, además del costo de evaluar
-la función objetivo. Sin considerar la complejidad interna de $f$, el costo
-temporal del movimiento es $O(TNd)$ y la memoria principal es $O(Nd)$.
 
 ## 4. Ruteo numérico de una iteración
 
@@ -588,13 +615,15 @@ Se ejecutó la implementación Python oficial con:
 - semilla NumPy 20260728.
 
 El mejor fitness registrado disminuyó desde $4281.3964$ en la primera
-iteración hasta $2.5198\times10^{-92}$ en la iteración 100. La curva del mejor
-valor fue monótona no creciente porque `Alpha_score` conserva el mejor valor
-histórico.
+evaluación hasta $2.5198\times10^{-92}$ en la iteración 100. La curva fue
+monótona no creciente porque `Alpha_score` conserva el mejor valor histórico.
+Una nueva ejecución interna con la misma configuración reprodujo ambos valores
+y confirmó que el fitness de `best_position` coincide con `best_score`.
 
-Este resultado solo demuestra que el código Python se ejecuta y converge en una
-función sencilla con una semilla concreta. No permite afirmar que PWO supere a
-otros métodos ni reproduce el conjunto de experimentos del artículo.
+Este resultado solo demuestra que el código Python se ejecuta y reduce el
+fitness en una función sencilla con una semilla concreta. No permite afirmar
+que PWO supere a otros métodos ni reproduce el conjunto de experimentos del
+artículo.
 
 ### 5.2 Diferencias entre paper y código
 
@@ -608,22 +637,42 @@ puntos:
    $a(t)$ no llega exactamente a cero. MATLAB recorre
    $t=1,\ldots,T$, haciendo $a(T)=0$ y exponiendo la última iteración a una
    división por cero.
-3. **Símbolo de la ecuación de explotación.** El paper escribe
-   $\mathrm{Linf}(t)$ en una ecuación sin definirlo. El código utiliza
-   `Alpha_influence`, interpretado aquí como $L(t)$.
+3. **Parámetro de influencia.** La ecuación de explotación escribe
+   $\mathrm{Linf}(t)$ sin definirlo. La tabla de parámetros del paper registra
+   `Linf = 0.05`, mientras la sección del rally fija
+   `VOTE_INCREMENT = 0.04`. El código calcula
+   `Alpha_influence = abs(0.04/a)` y usa ese valor en la explotación; el informe
+   lo representa como $L(t)$.
 4. **Momento de evaluación.** El pseudocódigo evalúa después del movimiento.
    Las implementaciones evalúan al comienzo de la iteración siguiente; por ello,
    la última población generada no vuelve a evaluarse.
-5. **Actualización vectorial dentro del ciclo de dimensiones.** Las dos ramas de
+5. **Actualización vectorial y selección de estrategia.** Las dos ramas de
    exploración escriben el vector completo dentro del ciclo sobre $j$. La
    segunda estrategia no utiliza $j$, pero puede ejecutarse repetidamente.
-6. **Reparación.** Los límites se aplican antes de evaluar, no inmediatamente
+   Además, el código vuelve a generar $q$ en cada dimensión, por lo que un mismo
+   agente puede alternar entre ambas estrategias dentro de una iteración.
+6. **Alfa histórico e índice excluido.** `Alpha_pos` conserva el mejor vector
+   histórico y `Alpha_index` identifica al agente que lo encontró. Ese agente se
+   excluye de la votación incluso si una exploración posterior separó su
+   posición actual de `Alpha_pos`.
+7. **Reparación.** Los límites se aplican antes de evaluar, no inmediatamente
    después de cada movimiento.
 
-Estas diferencias no se corrigen silenciosamente en el avance. Para mantener
-trazabilidad, las ecuaciones publicadas constituyen la formulación académica y
-la versión Python se utiliza como referencia operacional. La versión definitiva
-del proyecto deberá declarar cada decisión de implementación.
+Estas diferencias no se corrigen silenciosamente en el avance. El paper y el
+código se tratan como fuentes distintas: las ecuaciones publicadas describen la
+formulación y la versión Python permite observar una ejecución concreta. La
+versión definitiva del proyecto deberá declarar cada decisión de
+implementación.
+
+### 5.3 Límites de la verificación
+
+El corpus permite revisar por completo el paper principal, inspeccionar las
+implementaciones en Python y MATLAB y reproducir la prueba Python sobre Sphere.
+La implementación MATLAB no se ejecutó porque el entorno local no dispone de
+MATLAB ni Octave. Tampoco está disponible el texto completo de la referencia
+[3]. Por estas razones, las afirmaciones sobre ese trabajo y la equivalencia
+numérica entre ambas implementaciones quedan fuera del alcance de esta
+verificación.
 
 ## 6. Discusión
 
@@ -635,25 +684,24 @@ mejor solución actual. La segunda combina información global, mediante alfa y
 la media, con la distancia individual. La explotación actualiza cada variable
 respecto del alfa y es la regla más fácil de seguir en un ruteo manual.
 
-La actualización escalar-a-vector de la primera exploración distingue a PWO de
-esquemas convencionales que actualizan cada dimensión de forma independiente.
-Al mismo tiempo, plantea una pregunta de reproducibilidad porque el código
-ejecuta esa escritura dentro del ciclo de dimensiones. La experimentación futura
-deberá comparar al menos la interpretación literal del código con una versión
-que ejecute cada actualización vectorial una vez por agente.
+La actualización escalar-a-vector de la primera exploración difiere de una
+actualización componente a componente. También plantea una pregunta de
+reproducibilidad porque el código ejecuta esa escritura dentro del ciclo de
+dimensiones. La experimentación futura deberá comparar al menos la
+interpretación literal del código con una versión que ejecute cada
+actualización vectorial una vez por agente.
 
-El rally también merece análisis. Debido a la división por $L(t)$, el umbral
-puede tomar valores de gran magnitud, positivos o negativos. Además, el valor de
-`Alpha_score` participa directamente en la condición de voto, por lo que el
-comportamiento puede variar si la función objetivo admite valores negativos o
-si se transforma su escala. Esto sugiere que la sensibilidad del mecanismo no
-depende únicamente de la geometría de las posiciones, sino también de la escala
-del fitness.
+Del análisis algebraico del rally se infiere que, debido a la división por
+$L(t)$, el umbral puede tomar valores positivos o negativos de magnitud elevada.
+Además, `Alpha_score` participa directamente en la condición de voto, por lo que
+una transformación de signo o escala de la función objetivo puede modificar la
+decisión entre exploración y explotación. Estas son inferencias del equipo y
+requieren evaluación experimental.
 
-Estas observaciones no invalidan el método, pero delimitan el trabajo requerido
-para una reproducción rigurosa. Antes de binarizar PWO conviene estabilizar una
-especificación continua, probarla sobre funciones de referencia y registrar
-semillas, parámetros y número de evaluaciones.
+Estas observaciones delimitan el trabajo requerido para una reproducción
+rigurosa. Antes de binarizar PWO conviene estabilizar una especificación
+continua, probarla sobre funciones de referencia y registrar semillas,
+parámetros y número de evaluaciones.
 
 ## 7. Trabajo futuro
 
@@ -684,10 +732,10 @@ exploración y uno de explotación. Las ecuaciones 11, 12 y 17 son el núcleo qu
 genera $\mathbf{X}_i(t+1)$.
 
 El ruteo muestra que la actualización de explotación puede seguirse variable por
-variable y producir una mejora verificable. La ejecución preliminar confirma el
-funcionamiento del código Python en Sphere. Sin embargo, el contraste entre
-paper, pseudocódigo, Python y MATLAB revela diferencias que deben resolverse
-antes de presentar resultados experimentales comparativos.
+variable y que, en el ejemplo construido, mejora el fitness. La ejecución
+preliminar reproduce una reducción del mejor fitness en Sphere. Sin embargo, el
+contraste entre paper, pseudocódigo, Python y MATLAB revela diferencias que
+requieren decisiones antes de presentar resultados experimentales comparativos.
 
 Por tanto, el resultado principal del avance no es todavía una versión binaria
 ni una afirmación de superioridad, sino una comprensión operacional y trazable
@@ -698,10 +746,11 @@ reproducción y binarización con decisiones explícitas.
 
 Se utilizaron herramientas de inteligencia artificial generativa como apoyo
 para organizar antecedentes, estructurar borradores y revisar la claridad del
-texto. Las ecuaciones, referencias, cifras, discrepancias técnicas y resultados
-numéricos fueron contrastados con el paper seleccionado, el código oficial y
-cálculos reproducibles. Los autores son responsables de la revisión final y del
-contenido presentado.
+texto. Las ecuaciones del método se contrastaron con el paper principal y el
+código disponible; los resultados de Sphere se reprodujeron con la
+implementación Python. El texto completo de la referencia [3] y una ejecución de
+la versión MATLAB no estuvieron disponibles para esta revisión. Los autores son
+responsables de la revisión final y del contenido presentado.
 
 ## Referencias
 
@@ -717,4 +766,3 @@ code,” GitHub, 2026.
 [3] S. Zakeri, D. Konstantas, and P. Chatterjee, “The Painted Wolf Decision
 Optimizer,” *Computers*, vol. 15, no. 7, art. 452, 2026.
 <https://doi.org/10.3390/computers15070452>.
-

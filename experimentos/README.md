@@ -20,9 +20,9 @@ comparación experimental completa se reserva para el informe final.
 
 ### Python: JupyterLab
 
-Es la vía principal para explorar PWO porque permite cambiar parámetros,
-ejecutar por etapas, conservar resultados y agregar instrumentación sin
-modificar el código oficial.
+Es la vía principal para explorar PWO. Permite cambiar parámetros, ejecutar por
+etapas, conservar resultados y agregar instrumentación sin modificar el código
+oficial.
 
 Desde la raíz de `pwo-optimizacion-estocastica`:
 
@@ -50,9 +50,9 @@ Abre:
 experimentos/matlab/pwo_prueba_interactiva.m
 ```
 
-Los encabezados `%%` permiten usar **Run Section** en MATLAB. Este formato es
-texto versionable y resulta más fácil de revisar que un archivo binario
-`.mlx`. Si prefieres Live Script, usa **Save As → MATLAB Live Script (`.mlx`)**.
+Los encabezados `%%` permiten usar **Run Section** en MATLAB. El archivo de
+texto puede versionarse y revisarse directamente. Para convertirlo a Live
+Script, usa **Save As → MATLAB Live Script (`.mlx`)**.
 
 El script agrega temporalmente al path:
 

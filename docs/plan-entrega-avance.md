@@ -1,46 +1,29 @@
-# Plan de cierre - entrega de avance
+# Plan de cierre de la entrega de avance
 
 Plazo máximo: viernes 31 de julio de 2026 a las 19:00.
 
 ## Criterio de término
 
-La entrega está lista cuando el informe, las diapositivas y el guion explican la
-misma versión del algoritmo, usan la misma notación y permiten seguir al menos
-una asignación numérica de una variable de decisión.
+La entrega estará lista cuando el informe y la presentación expliquen la misma
+versión del algoritmo, usen la misma notación y permitan seguir una asignación
+numérica de las variables de decisión. El guion funciona como apoyo para
+comprobar esa coherencia.
 
-## Miércoles 29
+## Estado del contenido
 
 - [x] Crear repositorio de trabajo separado del código oficial.
 - [x] Copiar paper y antecedentes sin modificar los originales.
-- [x] Preparar estructura del informe.
-- [x] Preparar secuencia de presentación.
-- [x] Preparar primer guion.
-- [ ] Revisar entre ambos autores la notación $i,j,t$.
-- [ ] Confirmar que se usará el paper como formulación principal y Python como
-      referencia operacional.
+- [x] Preparar el informe de avance en Markdown.
+- [x] Preparar la guía de contenido por láminas.
+- [x] Preparar el guion de exposición.
+- [x] Unificar la notación $i,j,t$.
+- [x] Verificar el ruteo numérico.
+- [x] Ejecutar una prueba reproducible en Python.
+- [x] Registrar las diferencias entre paper, pseudocódigo y código.
+- [x] Tratar el paper como formulación principal y Python como implementación
+      observada.
 
-## Jueves 30
-
-- [ ] Revisar el informe completo, con énfasis en las ecuaciones 1 a 9.
-- [ ] Verificar manualmente el ruteo numérico.
-- [ ] Revisar las discrepancias paper-código y decidir cuáles se mencionarán
-      oralmente.
-- [x] Cerrar las diapositivas visibles y verificar el PPTX exportado.
-- [ ] Ensayar una primera vez con cronómetro.
-- [ ] Reducir texto o ejemplos si la exposición supera 15 minutos.
-
-## Viernes 31
-
-- [ ] Revisión cruzada de ortografía, fórmulas y referencias.
-- [ ] Ensayo final sin interrupciones.
-- [ ] Exportar presentación e informe a los formatos solicitados.
-- [ ] Abrir internamente todos los archivos finales y verificar que no estén
-      dañados.
-- [ ] Comprobar nombres de autores y asignatura.
-- [ ] Preparar correo con copia a todos.
-- [ ] Enviar antes de las 18:00 para mantener una hora de margen.
-
-## Revisión del contenido
+## Contenido que debe conservarse
 
 - [x] La metáfora del licaón ocupa como máximo una introducción breve.
 - [x] Se explica que cada lobo es una solución y cada dimensión una variable.
@@ -55,7 +38,20 @@ una asignación numérica de una variable de decisión.
 - [x] La binarización se presenta como trabajo futuro.
 - [x] Se incluye declaración de uso de IA.
 
-## Archivos de entrega
+## Pendiente antes del envío
 
-Los archivos finales se guardan en `entregables/avance/`. Las fuentes editables
-permanecen en `docs/`.
+- [ ] Revisión final entre ambos autores.
+- [ ] Construir la presentación a partir de la guía por láminas.
+- [ ] Ensayar con cronómetro y ajustar el contenido a 15 minutos o menos.
+- [ ] Decidir si la lámina sobre discrepancias queda en el cuerpo principal o
+      como respaldo.
+- [ ] Exportar el informe al formato final de entrega.
+- [ ] Comprobar autores, asignatura, fórmulas y referencias.
+- [ ] Abrir los archivos finales y verificar que no estén dañados.
+- [ ] Preparar el correo con copia a todos.
+- [ ] Enviar antes de las 18:00 para conservar una hora de margen.
+
+## Ubicación de los archivos
+
+Las fuentes editables permanecen en `docs/`. Las copias destinadas al envío se
+guardan en `entregables/avance/` después de la revisión de ambos autores.
