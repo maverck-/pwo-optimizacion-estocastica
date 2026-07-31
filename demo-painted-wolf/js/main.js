@@ -17,13 +17,17 @@ import { crearTerreno, DIFICULTADES, DOMINIO } from './terreno.js';
 const DIM = 2;
 const BANDAS = 15;          // niveles del mapa de calor, da aspecto topográfico
 const PASO_MAPA = 3;        // píxeles por muestra al construir el mapa
-const VEL_BASE = 1.2;       // iteraciones por segundo a 1×
+// Iteraciones por segundo a 1×. Como los multiplicadores escalan esta base,
+// bajarla alarga todas las velocidades en la misma proporción.
+const VEL_BASE = 0.9;
 
 // Cada iteración se lee en tres tiempos: la manada evalúa y vota quieta, luego
 // se mueve, y al final se asienta. Ese último compás deja notar el cambio de
 // posición antes de que empiece la iteración siguiente.
-const FASE_VOTO = 0.40;
-const FASE_MOV = 0.78;
+// El reparto favorece al desplazamiento, que es lo que cuesta seguir: casi la
+// mitad de la iteración se va en el recorrido.
+const FASE_VOTO = 0.34;
+const FASE_MOV = 0.82;
 
 // Compás extra cuando el alfa cambia de dueño: la simulación se detiene, el
 // candidato parpadea y el alfa saliente pierde su luz. Se acorta con la
