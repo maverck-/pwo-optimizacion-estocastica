@@ -53,5 +53,7 @@ comprobar esa coherencia.
 
 ## Ubicación de los archivos
 
-Las fuentes editables permanecen en `docs/`. Las copias destinadas al envío se
-guardan en `entregables/avance/` después de la revisión de ambos autores.
+Las fuentes editables permanecen en `docs/`. En `entregables/avance/` se
+mantiene la copia del informe destinada al envío. La presentación definitiva
+se agregará solo después de su preparación y revisión por ambos autores. El
+guion permanece como documento de apoyo en `docs/presentacion/`.

@@ -295,9 +295,3 @@ caso controlado.”
 “El paper contiene la formulación publicada y el código muestra una ejecución
 concreta con algunas diferencias. Se compararán variantes controladas antes de
 fijar una versión.”
-
-### ¿The Painted Wolf Decision Optimizer es el mismo algoritmo?
-
-“El corpus conserva su referencia bibliográfica, pero no el texto completo. Por
-eso no se afirma cómo funciona ni se realiza una comparación metodológica. En
-esta presentación, PWO designa exclusivamente la metaheurística de Sheikhi.”

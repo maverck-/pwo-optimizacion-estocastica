@@ -30,7 +30,7 @@ presentación; no constituyen entregables adicionales indicados por el profesor.
 ├── docs/
 │   ├── informe/          # Fuente Markdown del paper
 │   └── presentacion/     # Guía por láminas y guion
-├── entregables/avance/   # Copias y borradores de entrega
+├── entregables/avance/   # Informe de avance destinado a entrega
 ├── experimentos/        # Ejecuciones y resultados reproducibles
 ├── figuras/              # Recursos visuales propios o derivados
 ├── referencias/
@@ -61,8 +61,9 @@ la documentación técnica y los entregables del curso.
 - `docs/plan-entrega-avance.md`
 
 La guía organiza el contenido por láminas. El guion desarrolla la explicación
-oral y el informe conserva el análisis con estructura académica. Las copias de
-trabajo para la entrega se encuentran en `entregables/avance/`.
+oral y el informe conserva el análisis con estructura académica. La copia del
+informe destinada a la entrega se encuentra en `entregables/avance/`. La
+presentación definitiva se preparará a partir de la guía y del guion.
 
 ## Demo web interactiva
 

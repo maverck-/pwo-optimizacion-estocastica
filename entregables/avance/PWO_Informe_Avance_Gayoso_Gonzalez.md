@@ -7,9 +7,7 @@ Valparaíso
 MII902 Optimización Estocástica  
 Profesor: Dr. Broderick Crawford Labrín
 
-## Resumen
-
-Painted Wolf Optimization (PWO) es una metaheurística poblacional estocástica
+**RESUMEN:** Painted Wolf Optimization (PWO) es una metaheurística poblacional estocástica
 propuesta en 2026 e inspirada en la exploración cooperativa, la jerarquía y el
 rally previo a la caza de los licaones africanos. El presente informe de avance
 estudia el mecanismo continuo del algoritmo y, en particular, la forma en que
@@ -143,11 +141,8 @@ de marzo de 2026 [1]. La selección se justificó por su actualidad, la
 disponibilidad de código oficial en Python y MATLAB [2] y la presencia explícita
 de ecuaciones de movimiento en el dominio continuo.
 
-El corpus también contiene la referencia bibliográfica de *The Painted Wolf
-Decision Optimizer*, de Zakeri, Konstantas y Chatterjee [3], pero no incluye el
-texto completo de ese artículo. Por tanto, este avance no compara sus mecanismos
-con los de Sheikhi. En lo sucesivo, **PWO** se refiere exclusivamente a la
-metaheurística continua y estocástica estudiada en [1].
+En este informe, **PWO** se refiere exclusivamente a la metaheurística continua
+y estocástica estudiada en [1].
 
 ### 2.4 Alcance del avance
 
@@ -262,7 +257,7 @@ F_i(t)-L(t)F_{\alpha}(t)
 \tag{7}
 $$
 
-El umbral publicado es:
+El umbral publicado, con $r_3,r_4\sim U(0,1)$, es:
 
 $$
 H(t)
@@ -271,9 +266,7 @@ H(t)
 \left(
 \frac{a(t)(2r_3-r_4)}{L(t)}
 +r_4
-\right),
-\qquad
-r_3,r_4\sim U(0,1).
+\right).
 \tag{8}
 $$
 
@@ -322,7 +315,7 @@ D_{i,j}^{rand}(t).
 \tag{11}
 $$
 
-La ecuación 11 produce un escalar a partir de la dimensión $j$ y lo asigna al
+La ecuación (11) produce un escalar a partir de la dimensión $j$ y lo asigna al
 vector completo $\mathbf{X}_i$. El paper describe esta actualización
 escalar-a-vector como un mecanismo para que la información de una dimensión
 influya en la dirección global de búsqueda. En una lectura literal, todas las
@@ -363,7 +356,7 @@ La resta $\mathbf{X}_{\alpha}-\overline{\mathbf{X}}$ puede interpretarse como
 una dirección global entre el mejor registro y el centro de la población. El
 segundo término ajusta cada componente según la distancia absoluta del agente al
 alfa, ponderada por la fuerza del rally. Esta lectura geométrica es una
-interpretación del equipo a partir de la ecuación 12.
+interpretación del equipo a partir de la ecuación (12).
 
 ### 3.6 Explotación: actualización con referencia en el alfa
 
@@ -404,7 +397,7 @@ A_2(t)D_{i,j}^{\alpha}(t).
 \tag{17}
 $$
 
-La ecuación 17 muestra directamente la asignación requerida:
+La ecuación (17) muestra directamente la asignación requerida:
 
 1. se toma el valor de la variable $j$ de la mejor solución;
 2. se calcula la distancia entre ese valor y el del agente;
@@ -435,34 +428,46 @@ continuas sin otras restricciones, esta operación recupera la factibilidad.
 
 ### 3.8 Pseudocódigo operacional de referencia
 
-El siguiente pseudocódigo resume el orden de ejecución de las implementaciones
-locales. Difiere del pseudocódigo publicado en el momento de evaluación, aspecto
-que se detalla en la sección 5.2.
+El Algoritmo 1 resume el orden común observado en las implementaciones
+revisadas. Mantiene el ciclo interno sobre las variables: las ramas de
+exploración escriben el vector completo desde ese ciclo, mientras la explotación
+actualiza una componente. Las diferencias con el pseudocódigo publicado y entre
+los índices de Python y MATLAB se detallan en la sección 5.2.
 
-```text
-Inicializar N soluciones reales dentro de [lb, ub]
-Inicializar Alpha_score = infinito
+**Algoritmo 1. Pseudocódigo operacional de PWO**
 
-Para t = 1, ..., T:
-    Reparar cada solución dentro de [lb, ub]
-    Evaluar el fitness de cada solución
-    Actualizar Alpha_pos y Alpha_score
-
-    Calcular a(t), L(t), R(t) y H(t)
-
-    Para cada agente i:
-        Si R(t) < H(t):
-            Generar q
-            Si q < 0.5:
-                aplicar exploración con agente aleatorio
-            En otro caso:
-                aplicar exploración con alfa y media
-        En otro caso:
-            Para cada variable j:
-                aplicar explotación hacia el alfa
-
-Retornar Alpha_pos y Alpha_score
-```
+| 1: | Inicializar N soluciones reales dentro de [lb, ub] |
+|---:|:---|
+| 2: | Inicializar Alpha_score como infinito y Alpha_pos |
+| 3: | **Para cada iteración** t **hacer** |
+| 4: | &nbsp;&nbsp;&nbsp;&nbsp;**Para cada agente** i **hacer** |
+| 5: | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reparar X_i(t) dentro de [lb, ub] |
+| 6: | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Evaluar F_i(t) como f(X_i(t)) |
+| 7: | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Si** F_i(t) < Alpha_score **entonces** |
+| 8: | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Actualizar `Alpha_score`, `Alpha_pos` y `Alpha_index` |
+| 9: | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Fin si** |
+| 10: | &nbsp;&nbsp;&nbsp;&nbsp;**Fin para** |
+| 11: | &nbsp;&nbsp;&nbsp;&nbsp;Calcular a(t) y L(t) |
+| 12: | &nbsp;&nbsp;&nbsp;&nbsp;Calcular los votos y la fuerza R(t) |
+| 13: | &nbsp;&nbsp;&nbsp;&nbsp;Generar el umbral H(t) |
+| 14: | &nbsp;&nbsp;&nbsp;&nbsp;**Para cada agente** i **hacer** |
+| 15: | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Para cada variable** j **hacer** |
+| 16: | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Generar r_1, r_2 y calcular A_1(t) |
+| 17: | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Si** R(t) < H(t) **entonces** |
+| 18: | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Generar q ~ U(0, 1) |
+| 19: | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Si** q < 0.5 **entonces** |
+| 20: | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Actualizar X_i completa mediante exploración 1, ecuaciones (10) y (11) |
+| 21: | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**En otro caso** |
+| 22: | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Actualizar X_i completa mediante exploración 2, ecuación (12) |
+| 23: | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Fin si** |
+| 24: | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**En otro caso** |
+| 25: | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Actualizar X_i,j mediante explotación, ecuaciones (14) a (17) |
+| 26: | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Fin si** |
+| 27: | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Fin para** |
+| 28: | &nbsp;&nbsp;&nbsp;&nbsp;**Fin para** |
+| 29: | &nbsp;&nbsp;&nbsp;&nbsp;Registrar `Alpha_score` en la curva de convergencia |
+| 30: | **Fin para** |
+| 31: | Retornar `Alpha_pos`, `Alpha_score` y la curva de convergencia |
 
 ## 4. Ruteo numérico de una iteración
 
@@ -475,7 +480,9 @@ f(\mathbf{x})=x_1^2+x_2^2,
 \tag{19}
 $$
 
-La población inicial es:
+**Tabla 1**
+
+Población inicial utilizada en el ruteo numérico.
 
 | Agente | $\mathbf{X}_i(t)$ | Fitness |
 |---|---:|---:|
@@ -601,7 +608,7 @@ fitness del alfa previo, $1.9801$. En la siguiente evaluación, el agente 1
 pasaría a ser la mejor solución. Ninguna variable requiere reparación porque
 ambas permanecen en $[-10,10]$.
 
-## 5. Verificación preliminar y reproducibilidad
+## 5. Resultados preliminares y reproducibilidad
 
 ### 5.1 Prueba de funcionamiento
 
@@ -630,7 +637,7 @@ artículo.
 La inspección del paper y del repositorio oficial identificó los siguientes
 puntos:
 
-1. **Umbral del rally.** La ecuación 8 usa dos números aleatorios y reutiliza
+1. **Umbral del rally.** La ecuación (8) usa dos números aleatorios y reutiliza
    $r_4$. Python y MATLAB generan dos números para `E0` y un tercer número
    independiente para el término sumado antes de redondear.
 2. **Último valor de $a(t)$.** Python recorre $t=0,\ldots,T-1$, por lo que
@@ -669,10 +676,8 @@ implementación.
 El corpus permite revisar por completo el paper principal, inspeccionar las
 implementaciones en Python y MATLAB y reproducir la prueba Python sobre Sphere.
 La implementación MATLAB no se ejecutó porque el entorno local no dispone de
-MATLAB ni Octave. Tampoco está disponible el texto completo de la referencia
-[3]. Por estas razones, las afirmaciones sobre ese trabajo y la equivalencia
-numérica entre ambas implementaciones quedan fuera del alcance de esta
-verificación.
+MATLAB ni Octave. Por esta razón, la equivalencia numérica entre ambas
+implementaciones queda fuera del alcance de esta verificación.
 
 ## 6. Discusión
 
@@ -728,7 +733,7 @@ solver evaluará y reparará soluciones según las restricciones específicas.
 El avance permitió traducir PWO desde su metáfora biológica a un proceso de
 asignación de valores. Cada lobo corresponde a una solución real, el alfa es la
 mejor solución histórica y el rally selecciona entre dos movimientos de
-exploración y uno de explotación. Las ecuaciones 11, 12 y 17 son el núcleo que
+exploración y uno de explotación. Las ecuaciones (11), (12) y (17) son el núcleo que
 genera $\mathbf{X}_i(t+1)$.
 
 El ruteo muestra que la actualización de explotación puede seguirse variable por
@@ -748,21 +753,14 @@ Se utilizaron herramientas de inteligencia artificial generativa como apoyo
 para organizar antecedentes, estructurar borradores y revisar la claridad del
 texto. Las ecuaciones del método se contrastaron con el paper principal y el
 código disponible; los resultados de Sphere se reprodujeron con la
-implementación Python. El texto completo de la referencia [3] y una ejecución de
-la versión MATLAB no estuvieron disponibles para esta revisión. Los autores son
-responsables de la revisión final y del contenido presentado.
+implementación Python. La versión MATLAB se inspeccionó, pero no se ejecutó en
+esta revisión. Los autores son responsables de la revisión final y del contenido
+presentado.
 
 ## Referencias
 
-[1] S. Sheikhi, “Painted Wolf Optimization: A Novel Nature-Inspired
-Metaheuristic Algorithm for Real-World Optimization Problems,” *Computers,
-Materials & Continua*, vol. 87, no. 2, 2026.
-<https://doi.org/10.32604/cmc.2026.077788>.
-
-[2] S. Sheikhi, “Painted-Wolf-Optimization: official Python and MATLAB source
-code,” GitHub, 2026.
-<https://github.com/saeidsheikhi/Painted-Wolf-Optimization>.
-
-[3] S. Zakeri, D. Konstantas, and P. Chatterjee, “The Painted Wolf Decision
-Optimizer,” *Computers*, vol. 15, no. 7, art. 452, 2026.
-<https://doi.org/10.3390/computers15070452>.
+1. Sheikhi S. Painted wolf optimization: a novel nature-inspired
+   metaheuristic algorithm for real-world optimization problems. *Comput Mater
+   Contin.* 2026;87(2). doi:[10.32604/cmc.2026.077788](https://doi.org/10.32604/cmc.2026.077788).
+2. Sheikhi S. Painted-Wolf-Optimization [Internet]. GitHub; 2026. Disponible en:
+   [https://github.com/saeidsheikhi/Painted-Wolf-Optimization](https://github.com/saeidsheikhi/Painted-Wolf-Optimization).

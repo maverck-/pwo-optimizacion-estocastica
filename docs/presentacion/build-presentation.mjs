@@ -11,7 +11,7 @@ import { buildSlide26 } from "../../.tmp/presentation/layouts/slide-26.mjs";
 
 const OUT_DIR = new URL("../../.tmp/presentation/rendered/", import.meta.url);
 const FINAL_PPTX = new URL(
-  "../../entregables/avance/PWO_Presentacion_Avance_Gayoso_Gonzalez.pptx",
+  "../../.tmp/presentation/PWO_Presentacion_Avance_Borrador.pptx",
   import.meta.url,
 );
 
@@ -203,9 +203,6 @@ async function writeBlob(path, blob) {
 
 async function main() {
   await fs.mkdir(OUT_DIR, { recursive: true });
-  await fs.mkdir(new URL("../../entregables/avance/", import.meta.url), {
-    recursive: true,
-  });
 
   const presentation = Presentation.create({
     slideSize: { width: 1280, height: 720 },
